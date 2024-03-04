@@ -16,6 +16,20 @@ This adapted version of the openQCD 2.4 code allows for nested hierarchical inte
 The current coefficient sets are minimizing the (weighted) norm of the leading error coefficients. The investigations have been made for Hessian-free force-gradient integrators on a single level, similar to the investigations made by Omelyan, Mryglod and Folk in 2003. For nested integrators, the optimization of the degrees of freedoms will most likely result in different coefficients and is part of future research.
 
 
+CHANGES TO THE VERSION 2.4
+Compared to the openQCD package v2.4, the following files have been changed in order to enable the use of Hessian-free force-gradient integrators:
+/include/flags.h
+/include/update.h
+/modules/flags/mdint_parms.c
+/modules/forces/force0.c
+/modules/update/mdint.c
+/modules/update/mdsteps.c
+/modules/update/wsize.c
+/modules/update/update.c
+
+Moreover, the check functions in /devel/update have been adapted so that the check functions check1, check2 and check3 make use of the added Hessian-free force-gradient integrators.
+
+
 AUTHORS
 
 The initial release of the openQCD package was written by Martin Lüscher and
