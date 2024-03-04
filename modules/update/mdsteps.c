@@ -1225,40 +1225,16 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 
    for (i=0;i<n;i++)
    {
-      {
-         r[m].iop=s[i].iop;
-         r[m].eps=c*s[i].eps;
-         r[m].lvl_id=s[i].lvl_id;
-         m+=1;
-      }
+	 r[m].iop=s[i].iop;
+	 r[m].eps=c*s[i].eps;
+	 r[m].lvl_id=s[i].lvl_id;
+	 m+=1;
    }
 }
 
 
 static void insert_level(mdstep_t *s1,mdstep_t *s2,mdstep_t *r)
 {
-   /*int itu,nall;
-   double eps;
-
-   set_steps2zero(nsmx,r);
-
-   itu=iend-1;
-   nall=nall_steps(s1);
-
-   add_frc_steps(1.0,s2,r);
-   s2+=nfrc_steps(s2);
-   r+=nfrc_steps(r);
-
-   while ((*s2).iop==itu)
-   {
-      eps=(*s2).eps;
-      copy_steps(nall,eps,s1,r,1);
-      r+=nall;
-      s2+=1;
-      add_frc_steps(1.0,s2,r);
-      s2+=nfrc_steps(s2);
-      r+=nfrc_steps(r);
-   }*/ 
    int itu,nfrc,nall;
    double eps;
 
