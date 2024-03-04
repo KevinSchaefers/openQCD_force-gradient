@@ -1,0 +1,144 @@
+
+********************************************************************************
+
+                   Calculation of the little Dirac operator
+
+********************************************************************************
+
+The computation of the diagonal part Ablk of the little Dirac operator is
+straightforward and can be easily parallelized.
+
+In the case of the hopping terms Ahop, the computation is more complicated and
+requires some field components and matrices to copied from the local lattices
+to the neighbouring lattices.
+
+
+Extraction of boundary fields
+-----------------------------
+
+The computation of the matrix elements that contribute to Ahop involves a
+computation of the scalar products of spinor fields residing at the interior
+boundary points of the blocks in the DFL_BLOCKS grid. If b0 and b1 are
+neighbouring blocks with indices n0 and n1, respectively, where b1 is
+displaced from b0 in the positive direction mu, the geometrical situation is
+as follows:
+
+           -----> x_mu
+
+         -----   -----
+            e | | o
+            e | | o
+            o | | e
+            o | | e
+         -----   -----
+     block b0     block b1
+
+Here "e" and "o" denote even and odd interior boundary points. The scalar
+products to be computed are then
+
+  Ahop[8*n0+2*mu+1][Ns*k+l] = -0.5*(v_{n0,k},(1-gamma_mu)*U*v_{n1,l}),
+
+  Ahop[8*n1+2*mu][Ns*l+k]   = -0.5*(v_{n0,k},(1+gamma_mu)*U*v_{n1,l})^*,
+
+where v_{n0,k} and v_{n1,l} (k,l=1,..,Ns) are the deflation modes on block
+b0 and b1 respectively. In these scalar products, one sums over the interface
+points only and "U" stands for the link variables across the interface.
+
+It is helpful to split the sum in the scalar products in two sums, one going
+over the (e,o) pairs of points and the other over the (o,e) pairs (see the
+figure above). The computation then proceeds by extracting
+
+  psi_{k,e}=v_{n0,k}_e,   psi_{k,o}=U^dag*v_{n0,k}_o,
+
+on block n0 and
+
+  chi_{l,e}=v_{n1,l}_e,   chi_{l,o}=U*v_{n1,l}_o
+
+on block n1. Once this is done, the scalar products
+
+  sp[0][0][Ns*k+l]=(psi_{k,o},chi_{l,e}),
+
+  sp[0][1][Ns*k+l]=(psi_{k,o},gamma_mu*chi_{l,e}),
+
+  sp[1][0][Ns*k+l]=(psi_{k,e},chi_{l,o}),
+
+  sp[1][1][Ns*k+l]=(psi_{k,e},gamma_mu*chi_{l,o}),
+
+may be calculated and the hopping terms from n0 to/from n1 are then
+given by
+
+  Ahop[8*n0+2*mu+1][Ns*k+l] = -0.5*(sp[0][0]-sp[0][1]+sp[1][0]-sp[1][1]),
+
+  Ahop[8*n1+2*mu][Ns*l+k]   = -0.5*(sp[0][0]+sp[0][1]+sp[1][0]+sp[1][1])^*.
+
+An important point to note here is that the U-matrices needed when psi_{k.o}
+is computed are available in the local lattice where the block b0 resides,
+while those needed when chi_{l,0} is computed are available in the local
+lattice where the block b1 resides.
+
+
+Communication requirements
+--------------------------
+
+When the block b0 touches the boundary of the local lattice in direction mu,
+the neighbouring block b1 is on the neighbouring MPI process. If the ranks of
+the two processes are 0 and 1, for example, the fields psi_{k,e} are then
+copied from process 0 to process 1 and the fields chi_{l,e} from process 1 to
+process 0.
+
+After that the scalar products sp[0] and sp[1] can be computed on process 0
+and 1, respectively. The combination sp[0][0]+sp[0][1] must finally be sent
+from process 0 to process 1 and the combination sp[1][0]-sp[1][1] from process
+1 to process 0.
+
+
+Schedule
+--------
+
+The program that computes the hopping terms runs through the global loops
+
+for (ieo=0;ieo<2;ieo++)
+{
+  for (ifc=0;ifc<8;ifc++)
+  {
+     ...
+     ...
+  }
+}
+
+and inside the loop a subset of pairs (b0,b1) of blocks are processed. Which
+pairs are visited depends on ieo,ifc and the coordinate cpr[mu], mu=ifc/2, of
+the MPI process:
+
+- All even (odd) b0 are visited, if ieo+cpr[mu] is even (odd).
+
+- b1 is in direction -mu (+mu) from b0, if ifc+cpr[mu] is even (odd).
+
+For fixed even cpr[mu], first all pairs (b0,b1) where b0 is even and b1 is in
+direction -0 are visited. Then the direction changes to +0, then -1 and +1,
+and so on. Once all directions are processed, the odd blocks b0 are visited,
+while the order of the directions remains the same.
+
+For fixed odd cpr[mu], the MPI process first runs through all odd blocks b0
+and the order of the directions permuted to +0,-0,..,+3,-3. This scheme is
+such that along the boundaries of the local lattices in direction mu the
+blocks b0 play the role of b1 for the block b0 on the other side of the
+interface.
+
+
+Pre- and post-communication
+---------------------------
+
+For fixed ieo and ifc, the first step is to copy the fields psi_{k,e} along
+the interior boundary of the local lattices to the neighbouring lattices in
+direction ifc (if ifc+cpr[mu] is even) or ifc^0x1 (if ifc+cpr[mu] is odd). It
+suffices to copy the fields extracted from the even or odd blocks that touch
+the boundary if ieo+cpr[mu] is even or odd. At the same time, a copy of the
+fields chi_{l,e} is received from the neighbouring process and stored in
+a buffer for further processing (see Aw_com1.c).
+
+When the blocks at the boundary are processed, the contributions to the
+hopping terms on the other side of the boundary are first stored in a buffer.
+After processing all blocks at fixed ieo and ifc, the buffer is then copied to
+the neighbouring process and the hopping terms residing there are updated (see
+Aw_com2.c).

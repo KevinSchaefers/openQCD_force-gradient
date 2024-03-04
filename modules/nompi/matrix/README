@@ -1,0 +1,13 @@
+
+********************************************************************************
+
+                       Manipulation of small matrices
+
+********************************************************************************
+
+house.c        Householder inversion of a real matrix.
+
+jacobi.c       Diagonalization of a real symmetric square matrix using the
+               Jacobi method.
+
+matrix.c       Matrix operations.

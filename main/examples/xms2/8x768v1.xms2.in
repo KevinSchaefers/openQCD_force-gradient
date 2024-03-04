@@ -1,0 +1,47 @@
+
+################################################################################
+#
+# Master-field simulation of the SU(3) YM theory with Wilson plaquette action,
+# periodic boundary conditions and parallel configuration I/O. Parameters tuned
+# for simulations of 8x768^3 lattices.
+#
+# The parameter file assumes that the specified block size in the section
+# "Configurations" is compatible with the lattice sizes defined in
+# include/global.h (for further information see main/README.global and
+# main/README.io).
+#
+################################################################################
+
+[Run name]
+name         8x768v1
+
+[Log and data directories]
+log_dir      /data/openQCD/xms2/log
+dat_dir      /data/openQCD/xms2/dat
+
+[Configurations]
+type         b
+block_dir    /data/openQCD/ym1/blk
+nio_nodes    16
+nio_streams  16
+first        10
+last         24
+step         1
+
+[Observable fields]
+types        b
+block_dir    /data/openQCD/xms2/flds
+bs           8 96 96 96
+nio_nodes    16
+nio_streams  16
+
+[Wilson flow]
+integrator   RK3
+eps          1.0e-2
+tm           5.778 16.05
+
+[Observables]
+i3d          1
+range        4 64 2
+dmax         16
+Qmax         12.0

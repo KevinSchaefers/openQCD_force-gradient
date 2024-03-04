@@ -1,0 +1,24 @@
+
+[Run name]
+name         Snoopy137
+
+[Configurations]
+type         e
+cnfg_dir     /data/qcd2/cnfg
+block_dir
+local_dir
+nio_nodes    12
+nio_streams  8
+first        1
+last         4
+step         1
+
+[Wilson flow]
+integrator   RK3
+eps          0.02
+tm           1.0 2.0 3.0
+
+[Correlation function]
+i3d          0
+times        0 10
+dmax         10

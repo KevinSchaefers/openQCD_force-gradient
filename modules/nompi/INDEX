@@ -1,0 +1,15 @@
+
+********************************************************************************
+
+                       Directories of non-MPI modules
+
+********************************************************************************
+
+analysis             Data analysis programs.
+
+extras               Special functions and simple programs related to
+                     statistics.
+
+matrix               Manipulation of small matrices.
+
+utils                Basic utility functions.

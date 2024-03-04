@@ -1,0 +1,24 @@
+
+********************************************************************************
+
+                  Recurring functions used in check programs
+
+********************************************************************************
+
+
+Files
+-----
+
+dutils.c           Utility programs for the check programs in the devel
+                   directories.
+
+gtrans.c           Gauge transformations.
+
+rotud.c            Gauge-field rotations.
+
+
+Include file
+------------
+
+The file devfcts.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

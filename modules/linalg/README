@@ -1,0 +1,36 @@
+
+********************************************************************************
+
+                              Linear algebra
+
+********************************************************************************
+
+
+Files
+-----
+
+cmatrix.c      Complex matrix algebra (single-precision version).
+
+cmatrix_dble.c Complex matrix algebra (double-precision version).
+
+liealg.c       Basic functions for fields with values in the Lie
+               algebra of SU(3).
+
+salg.c         Generic linear algebra routines for single-precision
+               spinor fields.
+
+salg_dble.c    Generic linear algebra routines for double-precision
+               spinor fields.
+
+valg.c         Generic linear algebra routines for single-precision
+               complex fields.
+
+valg_dble.c    Generic linear algebra routines for double-precision
+               complex fields.
+
+
+Include file
+------------
+
+The file linalg.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

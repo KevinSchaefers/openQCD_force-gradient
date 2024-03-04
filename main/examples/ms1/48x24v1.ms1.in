@@ -1,0 +1,81 @@
+
+################################################################################
+#
+# Two-flavour QCD with SF boundary conditions, twisted-mass reweighting of
+# the second kind, even-odd preconditioning and no decomposition of the
+# reweighting factor.
+#
+# The parameter file assumes that the specified block sizes in the sections
+# "Configurations", "SAP" and "Deflation subspace" are compatible with the
+# lattice sizes defined in include/global.h (for further information see
+# main/README.global, main/README.io and modules/block/README.block).
+#
+################################################################################
+
+[Run name]
+name         48x24v1
+
+[Log and data directories]
+log_dir      /data/openQCD/ms1/log
+dat_dir      /data/openQCD/ms1/dat
+
+[Configurations]
+type         e
+cnfg_dir     /data/openQCD/qcd1/cnfg
+first        4
+last         64
+step         4
+nrw          1
+
+[Random number generator]
+level        0
+seed         88705
+
+[Lattice parameters]
+kappa        0.13635
+isw          0
+csw          1.90952
+
+[Boundary conditions]
+type         0
+cG           1.0
+cF           1.0
+theta        0.0 0.0 0.0
+
+[Reweighting factor 0]
+rwfact       RWTM2_EO
+im0          0
+mu           4.5e-3
+isp          0
+nsrc         24
+
+[Solver 0]
+solver       DFL_SAP_GCR
+nkv          16
+isolv        1
+nmr          4
+ncy          5
+nmx          128
+istop        0
+res          1.0e-11
+
+[SAP]
+bs           4 4 6 6
+
+[Deflation subspace]
+bs           4 4 6 6
+Ns           28
+
+[Deflation projection]
+nkv          16
+nmx          64
+res          1.0e-2
+nmx_gcr      24
+res_gcr      1.0e-2
+
+[Deflation subspace generation]
+kappa        0.13635
+mu           0.001
+ninv         10
+nmr          4
+ncy          4

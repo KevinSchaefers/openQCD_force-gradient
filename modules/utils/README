@@ -1,0 +1,31 @@
+
+********************************************************************************
+
+                            Utility programs
+
+********************************************************************************
+
+
+Files
+-----
+
+array.c        Allocation of multi-dimensional arrays.
+
+endian.c       Byte swapping programs.
+
+error.c        Error handling functions.
+
+mutils.c       Utility functions used in main programs.
+
+qsum.c         Quadruple-precision arithmetic.
+
+utils.c        Basic utility functions.
+
+wspace.c       Workspace allocation.
+
+
+Include file
+------------
+
+The file utils.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

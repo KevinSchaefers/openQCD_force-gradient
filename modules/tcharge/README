@@ -1,0 +1,28 @@
+
+********************************************************************************
+
+     Computation of the symmetric field tensor and associated quantities
+
+********************************************************************************
+
+
+Files
+-----
+
+ftcom.c          Communication of the field tensor components residing at
+                 the boundaries of the local lattices.
+
+ftensor.c        Computation of the symmetric field tensor.
+
+tcharge.c        Computation of the topological charge using the symmetric
+                 field tensor.
+
+ym_action.c      Computation of the Yang-Mills action using the symmetric
+                 field tensor.
+
+
+Include file
+------------
+
+The file tcharge.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

@@ -1,0 +1,33 @@
+
+********************************************************************************
+
+        Generic initialization and assignment programs for spinor fields
+
+********************************************************************************
+
+
+Files
+-----
+
+Pbnd.c          Generic programs for the projector theta to the exterior
+                boundary of a block of lattice points (version for single-
+                precision fields).
+
+Pbnd_dble.c     Generic programs for the projector theta to the exterior
+                boundary of a block of lattice points (version for double-
+                precision fields).
+
+scom.c          Communication functions for single-precision spinor fields.
+
+sdcom.c         Communication functions for double-precision spinor fields.
+
+sflds.c         Initialization and assignment programs.
+
+unorm.c         Programs related to the uniform norm of spinor fields.
+
+
+Include file
+------------
+
+The file sflds.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

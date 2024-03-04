@@ -1,0 +1,28 @@
+
+********************************************************************************
+
+                    SU(3) and complex 3x3 matrix functions
+
+********************************************************************************
+
+
+Files
+-----
+
+chexp.c        Computation of the SU(3) exponential function and its first and
+               second derivatives using the Cayley-Hamilton representation
+
+cm3x3.c        Complex 3x3 matrix operations
+
+random_su3.c   Generation of random SU(3) matrices
+
+su3prod.c      Products of double-precision 3x3 matrices
+
+su3ren.c       Renormalization of SU(3) matrices
+
+
+Include file
+------------
+
+The file su3fcts.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

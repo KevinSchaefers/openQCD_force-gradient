@@ -1,0 +1,32 @@
+
+********************************************************************************
+
+                          Lattice and block geometry
+
+********************************************************************************
+
+
+Files
+-----
+
+bcnds.c         Programs related to the boundary conditions in the time
+                direction.
+
+blk_geometry.c  Programs related to block geometry.
+
+ftidx.c         Labeling of the field tensor components on the faces of
+                the local lattice.
+
+geogen.c        Generic programs related to the global lattice geometry.
+
+geometry.c      Programs related to the global lattice geometry.
+
+uidx.c          Labeling of the link variables on the faces of the local
+                lattice.
+
+
+Include file
+------------
+
+The file lattice.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

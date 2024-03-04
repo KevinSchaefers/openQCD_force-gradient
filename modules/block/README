@@ -1,0 +1,28 @@
+
+********************************************************************************
+
+           Block allocation and block field initialization programs
+
+********************************************************************************
+
+
+Files
+-----
+
+blk_grid.c     Block grid allocation.
+
+block.c        Basic allocation programs for blocks of lattice points.
+
+map_s2blk.c    Copying of spinor fields to and from the blocks in a
+               block grid.
+
+map_sw2blk.c   Copying of the SW fields to the blocks in a block grid.
+
+map_u2blk.c    Copying of the gauge fields to the blocks in a block grid.
+
+
+Include file
+------------
+
+The file block.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

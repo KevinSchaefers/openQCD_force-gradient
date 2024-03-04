@@ -1,0 +1,99 @@
+
+********************************************************************************
+
+                      Definition of the point index
+
+********************************************************************************
+
+The labeling of the lattice points in the local lattice and the contents of
+the associated global arrays ipt, iup, idn and map are described in the file
+main/README.global. When OpenMP threads are used, a further subdivision of the
+local lattice and a corresponding ordering of the points is required.
+
+
+Block terminology
+-----------------
+
+In the following, bs[0] x bs[1] x bs[2] x bs[3] blocks of lattice points are
+considered with positive *even* sizes bs[0],..,bs[3].
+
+A division of the lattice in blocks is a collection of disjoint blocks, whose
+union coincides with the lattice. In general, the blocks need not have the
+same sizes, but it is assumed that adjacent blocks have matching sizes at the
+common face.
+
+
+Logical block structure
+-----------------------
+
+There is a hieararchy of block divisions of the lattice with blocks of
+decreasing size.
+
+(a) Local lattice
+
+These are the L0 x L1 x L2 x L3 blocks with sizes specified in global.h, which
+are associated with the MPI processes.
+
+(b) Thread-local lattice
+
+These are the L0_TRD x L1_TRD x L2_TRD x L3_TRD blocks with sizes specified in
+global.h, which are associated with the OpenMP threads launched by the local
+MPI process.
+
+(c) Division of the thread-local lattices
+
+Each of thread-local lattices is divided into 16 blocks that are visited
+one after another when a program runs through the lattice. The division
+is obtained by dividing the sizes L0_TRD,..,L3_TRD according to
+
+  L0_TRD=L0_TRDa+L0_TRDb,  L0_TRDa=L0_TRD/2+(L0_TRD/2)%2
+   .
+   .
+  L3_TRD=L3_TRDa+L3_TRDb,  L3_TRDa=L3_TRD/2+(L3_TRD/2)%2
+
+Since the sizes L0_TRD,..,L3_TRD are guaranteed to be even and at least 4, the
+sizes of the 16 blocks are even and at least 2. Along a given coordinate axis,
+their sizes may however alternate between two different values.
+
+(d) Cache blocks
+
+Each of the 16 blocks in the thread-local lattices is further divided into
+cache blocks with maximal size in the time direction and sizes equal to 2 or 4
+in the space directions.
+
+
+Block offsets
+-------------
+
+The points on the local lattice are labeled by an index ix ranging from 0 to
+VOLUME-1. First come all even points and then all odd points. Within any of
+the blocks (a)--(d), the points are labeled contiguously.
+
+The offsets of the points on the local and thread-local lattices are:
+
+0                         First even point on the local lattice.
+
+VOLUME/2                  First odd point on the local lattice.
+
+k*VOLUME_TRD/2            First even point on the k'th thread-local lattice.
+
+k*VOLUME_TRD/2+VOLUME/2   First odd point on the k'th thread-local lattice.
+
+From the latter the first even and odd points in the 16 subblocks of the
+thread-local lattices are reached by adding sbofs[l]/2, where l=0,..,15 labels
+the subblocks (sbofs[16] is one of the global arrays declared in global.h).
+
+The cache blocks are hidden from the user and will normally not need to be
+accessed individually.
+
+
+Ordering of the blocks
+----------------------
+
+As explained in main/README.global, the thread-local blocks form a regular
+hypercubic block grid that is defined by the local lattice sizes and the block
+sizes specified in global.h. The blocks in this block grid are ordered
+lexicographically (first in direction 3, then direction 2, and so on).
+
+In the case of the subblocks of the thread-local lattices, the ordering is
+lexicographic too.

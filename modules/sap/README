@@ -1,0 +1,27 @@
+
+********************************************************************************
+
+                     Schwarz Alternating Procedure (SAP)
+
+********************************************************************************
+
+
+Files
+-----
+
+blk_solv.c          Solution of the Dirac equation on the blocks of the
+                    SAP_BLOCKS grid.
+
+sap.c               Multiplicative alternating Schwarz procedure for the
+                    solution of the Wilson-Dirac equation.
+
+sap_com.c           SAP communication program.
+
+sap_gcr.c           SAP+GCR solver for the Wilson-Dirac equation.
+
+
+Include file
+------------
+
+The file sap.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

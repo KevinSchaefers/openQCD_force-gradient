@@ -1,0 +1,35 @@
+
+********************************************************************************
+
+                       Sheikholeslami-Wohlert term
+
+********************************************************************************
+
+Computation and action of the Pauli term in the O(a) improved Wilson-Dirac
+operator.
+
+
+Files
+-----
+
+pauli.c             Basic functions for single-precision Hermitian 6x6 matrices.
+
+pauli_dble.c        Basic functions for double-precision Hermitian 6x6 matrices.
+
+swalg.c             Linear algebra functions for matrices of type pauli_dble.
+
+swexp.c             Exponential of traceless 6x6 Hermitian matrices and related
+                    functions.
+
+swflds.c            Allocation and initialization of the global SW fields.
+
+sw_term.c           Computation of the SW term.
+
+
+
+Include file
+------------
+
+The file sw_term.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above. The types pauli,
+pauli_dble and u3_alg_dble are defined in su3.h.

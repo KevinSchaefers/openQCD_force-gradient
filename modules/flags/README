@@ -1,0 +1,54 @@
+
+
+********************************************************************************
+
+                       Flags and parameter data base
+
+********************************************************************************
+
+The modules in this directory serve to control the program flow and help
+to ensure that the different programs do not interfere with each other
+in unintended ways.
+
+
+Files
+-----
+
+action_parms.c   Action parameter data base.
+
+dfl_parms.c      Deflation parameters.
+
+dft4d_parms.c    4d discrete Fourier transform parameter data base.
+
+dft_parms.c      Discrete Fourier transform parameter data base.
+
+flags.c          Flags data base input and query programs (see README.flags).
+
+force_parms.c    Force parameter data base.
+
+hmc_parms.c      Basic HMC parameters.
+
+lat_parms.c      Lattice parameters.
+
+mdint_parms.c    Molecular-dynamics integrator data base.
+
+parms.c          Utility programs for the administration of parameter sets.
+
+rat_parms.c      Rational function parameter data base.
+
+rw_parms.c       Reweighting factor parameter data base.
+
+sap_parms.c      SAP parameters.
+
+smd_parms.c      Basic SMD parameters.
+
+sf_parms.c       Schroedinger functional boundary values.
+
+solver_parms.c   Solver parameter data base.
+
+
+Include file
+------------
+
+The file flags.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

@@ -1,0 +1,44 @@
+
+********************************************************************************
+
+                          Little Dirac Operator
+
+********************************************************************************
+
+
+Files
+-----
+
+Aw_ops.c          Allocation and computation of the little Dirac operator.
+
+Aw.c              Application of the single_precision little Dirac operator.
+
+Aw_dble.c         Application of the double-precision little Dirac operator.
+
+ltl_modes.c       Computation of the little modes.
+
+
+The following are collections of functions used in the programs that
+compute the little Dirac operator.
+
+Aw_blk.c          Computation of the diagonal terms of the little Dirac
+                  operator.
+
+Aw_hop.c          Computation of the hopping terms of the little Dirac
+                  operator.
+
+Aw_com1.c         Communication of the basis fields on the interior boundary
+                  of the local lattice.
+
+Aw_com2.c         Communication of the hopping terms on the exterior boundary
+                  of the local lattice.
+
+Aw_gen.c          Basic programs needed for the computation of the little
+                  Dirac operator.
+
+
+Include file
+------------
+
+The file little.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

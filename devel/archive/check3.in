@@ -1,0 +1,8 @@
+
+blk_dir      /home/data/openQCD/blk    # Configuration directory (block-exported
+                                       # configurations).
+bs           16 16 16 16               # Block size to be used for block-
+                                       # exported configurations.
+nio_nodes    2                         # Number of top level subdirectories
+                                       # for block-exported storage.
+nio_streams  2                         # Number of parallel I/O streams.

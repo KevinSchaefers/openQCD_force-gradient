@@ -1,0 +1,31 @@
+
+********************************************************************************
+
+                Allocation and initialization of the gauge fields
+
+********************************************************************************
+
+
+Files
+-----
+
+bstap.c        Allocation and computation of the boundary staple field.
+
+plaq_sum.c     Calculation of plaquette sums.
+
+shift.c        Translation of the global double-precision gauge field.
+
+udcom.c        Communication of the double-precision link variables at
+               the boundaries of the local lattice.
+
+uflds.c        Allocation and initialization of the global gauge fields.
+
+uinit.c        Generic assignment and initialization programs for arrays
+               of SU(3) matrices.
+
+
+Include file
+------------
+
+The file uflds.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

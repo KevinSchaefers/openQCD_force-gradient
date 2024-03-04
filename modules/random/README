@@ -1,0 +1,29 @@
+
+********************************************************************************
+
+                         Random number generation
+
+********************************************************************************
+
+
+Files
+-----
+
+gauss.c          Generation of single- and double-precision Gaussian
+                 random numbers.
+
+ranlux.c         Initialization of ranlxs and ranlxd.
+
+ranlux_common.c  Collection of functions used by ranlxd and ranlxs.
+
+ranlxd.c         Double-precision generator.
+
+ranlxs.c         Single-precision generator.
+
+
+
+Include file
+------------
+
+The file random.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

@@ -1,0 +1,275 @@
+
+********************************************************************************
+
+                         Block structure explained
+
+********************************************************************************
+
+Rectangular blocks of lattice points and their exterior boundaries are
+described by the structures block_t and bndry_t that are defined in the
+header file block.h. These objects can be easily handled by passing the
+corresponding pointers to the functions that operate on them.
+
+It is currently not possible to allocate blocks that are not fully contained
+in the local lattice. Moreover, the block sizes must be even and not smaller
+than 4. The exterior boundaries of a block may, however, overlap with the
+lattices on the neighbouring processes.
+
+
+Block structure
+---------------
+
+Block data and fields are collected in a structure
+
+typedef struct
+{
+   int *bo,*bs,vol,vbb,nbp,ns,nsd,shf;
+   int *ipt,*imb,*ibp;
+   int (*iup)[4],(*idn)[4];
+   su3 *u;
+   su3_dble *ud;
+   pauli *sw;
+   pauli_dble *swd;
+   spinor **s;
+   spinor_dble **sd;
+   bndry_t *bb;
+} block_t;
+
+block_t b;
+
+with the following entries:
+
+b.bo[4]                 Cartesian coordinates (in the local lattice) of the
+                        base point of the block.
+
+b.bs[4]                 Linear sizes of the block in the four dimensions. The
+                        local coordinates in direction mu of the points in the
+                        block thus range from b.bo[mu] to b.bo[mu]+b.bs[mu]-1
+                        inclusive.
+
+b.vol                   Number of points in the block.
+
+b.vbb                   Total number of exterior boundary points of the
+                        block.
+
+b.nbp                   Number of points in the block at global time 0
+                        (boundary conditions type 0,1 or 2)and and time
+                        NPROC0*L0-1 (boundary conditions type 0).
+
+b.ns                    Number of single-precision spinor fields on the block.
+
+b.nsd                   Number of double-precision spinor fields on the block.
+
+b.shf                   The bits b1,b2,...,b8 in this number (counting from
+                        the lowest) indicate that
+
+                          b1=1:  The block is protected,
+                          b2=1:  The geometry arrays are shared,
+                          b3=1:  b.u, bb.u and b.sw are shared,
+                          b4=1:  b.ud, bb.ud and b.swd are shared,
+                          b5=1:  b.s is shared,
+                          b6=1:  b.sd is shared,
+                          b7=1:  bb.w is shared,
+                          b8=1:  bb.wd is shared
+
+			(the last two bits refer to the Weyl fields on the
+                        exterior boundaries of the block). Shared arrays
+                        are allocated elsewhere and should never be freed.
+                        Protected blocks cannot be modified.
+
+b.ipt[b.vol+1]          The block points are labeled by an index ix. If
+                        x0,x1,x2,x3 are the coordinates of a block point
+                        relative to the base point, a primitive point label
+                        is iy=x3+b.bs[3]*x2+...+b.bs[3]*b.bs[2]*b.bs[1]*x0.
+                        This array returns the actual label ix=b.ipt[iy]
+                        (the last entry in the array is not used).
+
+b.imb[b.vol+1]          For a given block point with label ix, this array
+                        returns the label iz=b.imb[ix] of the point in the
+                        local lattice. The array thus defines the embedding
+                        of the block in full lattice (the last entry in the
+                        array is not used).
+
+b.ibp[b.nbp]            Array of the labels ix of the block points at global
+                        time 0 (boundary conditions type 0,1 or 2) and time
+                        NPROC0*L0-1 (boundary conditions type 0). The labels
+                        are in ascending order. In particular, the first and
+                        second half of the array contain the labels of the
+                        even and odd points, respectively.
+
+b.iup[b.vol][4]         Block geometry arrays, giving the labels of the
+b.idn[b.vol][4]         neighbours of a given block point. If the neighbour
+                        is on the exterior boundary of the block, the arrays
+                        return the value b.vol.
+
+b.u[4*b.vol]            The single-precision gauge field on the block is
+                        stored in this array in such a way that the 8 link
+                        variables at the odd point with label ix are the 8
+                        elements at b.u+8*(ix-b.vol/2) (as on the global
+                        lattice). The links sticking out of the block are
+                        special in the sense that the variables residing
+                        there are not used.
+
+b.ud[4*b.vol]           This array contains the double-precision gauge field
+                        on the block. The storage conventions are the same as
+                        in the case of the single-precision field.
+
+b.sw[2*b.vol]           The single-precision SW term is allocated together
+                        with the single-precision gauge field. The upper
+                        and lower Pauli matrix at the point with label ix
+                        are stored at b.sw[2*ix] and b.sw[2*ix+1].
+
+b.swd[2*b.vol]          The double-precision SW term is allocated together
+                        with the double-precision gauge field. The upper
+                        and lower Pauli matrix at the point with label ix
+                        are stored at b.swd[2*ix] and b.swd[2*ix+1].
+
+b.s[b.ns][b.vol+1]      The value of the k'th single-precision spinor field
+                        at the block point with label ix is b.s[k][ix]. In
+                        each of these fields the last entry is not used.
+
+b.sd[b.nsd][b.vol+1]    The value of the k'th double-precision spinor field
+                        at the block point with label ix is b.sd[k][ix]. In
+                        each of these fields the last entry is not used.
+
+b.bb[8]                 Array of boundary structures, one for each face
+                        (see below).
+
+Which fields are allocated and which are shared can be chosen when the block
+is allocated (see alloc_blk() and clone_blk() [block.c]).
+
+The phrase "... is not used" refers to an array element that serves as
+a place-holder or for another technical purpose. At the beginning of any
+subprogram, the variables stored there will, in general, contain random
+values.
+
+
+Boundary structure
+------------------
+
+The geometry of each face of the exterior boundary of a block and the
+fields living there are described by a structure
+
+typedef struct
+{
+   int ifc,ibn,vol,nw,nwd;
+   int *ipp,*map,*imb;
+   su3 *u;
+   su3_dble *ud;
+   weyl **w;
+   weyl_dble **wd;
+} bndry_t;
+
+bndry_t bb;
+
+with the following entries:
+
+bb.ifc                  The faces in the -0,+0,-1,+1,-2,+2,-3,+3 directions
+                        are labeled by a number ifc ranging from 0 to 7.
+
+bb.ibn                  Indicates whether the face is contained in the
+                        exterior boundary of the local lattice (bb.ibn=1)
+                        or not (bb.ibn=0).
+
+bb.vol                  Number of points in the face.
+
+bb.nw                   Number of single-precision Weyl fields on the face.
+
+bb.nwd                  Number of double-precision Weyl fields on the face.
+
+bb.ipp[bb.vol+1]        The points in the face are labeled by an index ix.
+                        Each point has a unique nearest point on the block
+                        (its "partner point") with label bb.ipp[ix] (the
+                        last entry in the array is not used).
+
+bb.map[bb.vol+1]        For a given face point with label ix, bb.map[ix] is
+                        the label of the partner point of the corresponding
+                        point on the opposite face of the block (the last
+                        entry in the array is not used).
+
+bb.imb[bb.vol+1]        For a given face point with label ix, bb.imb[ix]
+                        is the label of the point in the local lattice
+                        (or in its exterior boundary; see README.global).
+                        The array thus defines the embedding of the face
+                        in full lattice (the last entry in the array is
+                        not used).
+
+bb.u[bb.vol]            Array of the single-precision gauge-field variables
+                        residing on the links that connect the face points
+                        with their partner points on the block.
+
+bb.ud[bb.vol]           Array of the double-precision gauge-field variables
+                        residing on the links that connect the face points
+                        with their partner points on the block.
+
+bb.w[bb.nw][bb.vol]     The value of the k'th single-precision Weyl field
+                        at the face point with label ix is bb.w[k][ix].
+
+bb.wd[bb.nwd][bb.vol]   The value of the k'th double-precision Weyl field
+                        at the face point with label ix is bb.wd[k][ix].
+
+Which field arrays are allocated may be chosen when the program alloc_bnd()
+[block.c] is called.
+
+
+Point labeling
+--------------
+
+The labeling of the points in the blocks and their exterior boundaries is in
+many ways similar to the one used for the points in the local lattice (see
+main/README.global). In particular, the even points in the block and on each
+face of the block boundary come first. The ordering of the latter is moreover
+consistent with the one of the partner points in the block, i.e.
+bb.ipp[ix]<bb.ipp[iy] if and only if ix<iy.
+
+
+Block grids
+-----------
+
+Grids of blocks that cover the whole lattice without overlaps can be
+allocated and initialized using the programs in the module blk_grid.c.
+The enumeration type blk_grid_t (see block.h) lists the currently
+available block grids, viz.
+
+  SAP_BLOCKS       Block grid used for the SAP preconditioner,
+
+  DFL_BLOCKS       Block grid used for the local deflation,
+
+  TEST_BLOCKS      Block grid used in check programs.
+
+The size of the blocks in a block grid is constrained by the following
+requirements:
+
+- The blocks must divide the local lattices.
+
+- The number of blocks in each local lattice is an even
+  multiple of the number NTHREAD of OpenMP threads.
+
+- The total number of blocks along any coordinate axis is even.
+
+These conditions imply that the blocks can be globally chessboard-coloured and
+that there is an equal number, proportional to NTHREAD, of black and white
+blocks in each local lattice.
+
+Subsets of blocks in the local lattice may share some index and field arrays,
+while other arrays are owned by a single block. Geometry arrays that only
+refer to the local structure of the blocks can be shared among all blocks, for
+example.
+
+
+Share flags in block grids
+--------------------------
+
+In the case of the gauge, Dirac and Weyl fields, the fact that the OpenMP
+threads may simultaneously operate on several blocks must be taken into
+account.
+
+The blocks in the local lattices are labeled by an index ib=0,..,nb-1, where
+the first nb/2 blocks all have the same colour. In the SAP and DFL programs,
+the OpenMP thread number k sequentially visits the blocks with indices
+
+  ib=k+l*NTHREAD,  l=0,..,nb/NTHREAD.
+
+Gauge, Dirac and Weyl fields that are shared according to the block share
+flags b.shf are shared among these blocks, but not among blocks having
+different values of ib%NTHREAD.

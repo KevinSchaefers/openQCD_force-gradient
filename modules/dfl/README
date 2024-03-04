@@ -1,0 +1,29 @@
+
+********************************************************************************
+
+                 Domain-decomposed deflation preconditioner
+
+********************************************************************************
+
+
+Files
+-----
+
+dfl_geometry.c      Geometry of the DFL_BLOCKS block grid.
+
+dfl_modes.c         Computation of the global modes used to construct
+                    the deflation subspace.
+
+dfl_sap_gcr.c       SAP+GCR solver for the Wilson-Dirac equation with
+                    local deflation.
+
+dfl_subspace.c      Basic programs related to the deflation subspace.
+
+ltl_gcr.c           GCR solver for the little Dirac equation Aw*psi=eta.
+
+
+Include file
+------------
+
+The file dfl.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

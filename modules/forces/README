@@ -1,0 +1,44 @@
+
+********************************************************************************
+
+                      MD force and action programs
+
+********************************************************************************
+
+
+Files
+-----
+
+force0.c       Action of the double-precision gauge field and associated
+               force.
+
+force1.c       Twisted-mass pseudo-fermion action and force.
+
+force2.c       Hasenbusch twisted_mass pseudo-fermion action and force.
+
+force3.c       Rational function action and forces.
+
+force4.c       Twisted mass pseudo-fermion action and force with even-odd
+               preconditioning.
+
+force5.c       Hasenbusch twisted mass pseudo-fermion action and force
+               with even-odd precconditioning.
+
+frcfcts.c      Generic functions used for the force calculation.
+
+genfrc.c       Calculation of quark forces.
+
+tmcg.c         CG solver for the normal Wilson-Dirac equation with a
+               twisted-mass term.
+
+tmcgm.c        Multi-shift CG solver for the normal even-odd preconditioned
+               Wilson-Dirac equation with a twisted mass term.
+
+xtensor.c      Spin parts of the quark force.
+
+
+Include file
+------------
+
+The file forces.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

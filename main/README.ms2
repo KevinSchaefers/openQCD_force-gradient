@@ -1,0 +1,155 @@
+
+Main program ms2
+
+SYNTAX
+
+ms2 -i <filename>
+
+
+DESCRIPTION
+
+This program reads gauge field configurations from disk and estimates the
+spectral range [ra,rb] of the even-odd preconditioned Hermitian Dirac operator
+(Dwhat^dagger*Dwhat)^(1/2) using the power method. A summary of results is
+printed to the log file together with a table of suggested parameters of the
+Zolotarev rational approximation for the operator (Dwhat^dagger*Dwhat)^(-1/2).
+
+
+COMMAND-LINE OPTIONS
+
+The program has only one option since most of the parameters are passed
+through an input file. The option is
+
+-i <filename>    Specifies the name of the input file. The name can be
+                 a fully qualified name or be specified relative to the
+                 working directory.
+
+
+INPUT PARAMETERS
+
+The lattice size and the process grid must be defined in the file global.h
+(see README.global). All other parameters are read from the input file. An
+example of a valid input file is ms2.in in this directory. The parameter
+values specified in this file are:
+
+[Run name]
+name         Snoopy137             # Run name = configuration base name.
+
+[Log directory]
+log_dir      ../data/ms2/log       # Log file directory.
+
+[Configurations]
+type         e                     # Configuration storage type (e=exported,
+                                   # b=block-exported, l=local).
+cnfg_dir     /data/qcd1/cnfg       # Configuration directory (type e).
+block_dir    /data/qcd1/blk        # Configuration directory (type b).
+local_dir    /data/qcd1/loc        # Configuration directory (type l).
+nio_nodes    8                     # Number of top level subdirectories used
+                                   # for block-exported or local storage.
+nio_streams  4                     # Number of parallel I/O streams (block-
+                                   # exported or local storage).
+first        1                     # No of the first configuration to consider.
+last         4                     # No of the last configuration.
+step         1                     # Configuration separation (last-first must
+                                   # be an integer multiple of step).
+
+[Dirac operator]
+kappa        0.1300                # Hopping parameter.
+isw          0                     # Form of the SW term (0: traditional,
+                                   # 1: exponential).
+csw          1.234                 # Coefficient of the SW term.
+
+[Boundary conditions]
+type         2                     # Type of boundary condition (0: open,
+                                   # 1: SF, 2: open-SF, 3: periodic).
+phi          0.12 -0.56            # Boundary values of the gauge field at
+                                   # time 0.
+phi'         0.92 0.76             # Boundary values of the gauge field at
+                                   # time NPROC0*L0.
+cF           0.95                  # Fermion action improvement coefficient
+                                   # at time 0.
+cF'          0.90                  # Fermion action improvement coefficient
+                                   # at time NPROC0*L0.
+theta        0.5 1.0 -0.5          # Angles specifying the phase-periodic bc
+                                   # of the quark fields in space.
+
+[Power method]
+np_ra        20                    # Number of power iterations to be
+                                   # applied when estimating ra.
+np_rb        100                   # Number of power iterations to be
+                                   # applied when estimating rb.
+
+Then follows a description of the solver for the Dirac equation to be used in
+the course of the inverse power iterations (see doc/parms.pdf). The supported
+solvers are CGNE, SAP_GCR and DFL_SAP_GCR.
+
+The chosen parameter values must satisfy the following constraints:
+
+- In the case of configuration storage of type "b", the block size bs must
+  divide the lattice size and the local lattice must divide the block size.
+  Moreover, nio_nodes and nio_streams must divide the number nb of blocks.
+
+- In the case of storage of type "l", nio_nodes and nio_streams must divide
+  the number NPROC of MPI processes.
+
+The solver index must be set to 0. Superfluous sections and parameters may be
+deleted or commented out. If present they are not read by the program and the
+specified values (if any) have no effect on the run.
+
+
+CONFIGURATION DIRECTORY STRUCTURE
+
+The configuration directory tree is expected to be of the form described in
+README.ym1.
+
+
+FILES
+
+The program searches for the field configurations
+
+  <run name>n<int>
+
+in the specified configuration directory (or its subdirectories in the case of
+storage of type "b" and "l"), where <int> is the configuration number.
+
+The program prints the results of the computations to the files
+
+  <run name>.ms2.log       Log file
+  <run name>.ms2.log~      Backup log file
+
+in the directory log_dir. The backup file is updated each time a configuration
+is fully processed.
+
+The log directory log_dir and the configuration directories must be accessible
+from MPI process 0. In the case of storage type "b" or "l", the configuration
+directories must be accessible from all MPI processes that read or write
+configuration files (see README.io and README.ym1).
+
+
+SAFETY MEASURES AND ERROR REPORTING
+
+A number of safety measures have been implemented:
+
+- It is not possible to overwrite an existing log file. The file
+  must first be deleted or renamed if a run is to be repeated.
+
+- The accessibility of the various directories and the compatibility
+  of the chosen parameters is checked at the beginning of the program.
+
+Any attempt to force illegal operations leads to an abnormal termination of
+the program, with an informative message being written either to the log file
+or the file STARTUP_ERROR in the program directory (if the error occurs before
+the log file is opened).
+
+It should be noted that filenames may not be longer than 127 characters. The
+program checks at an early stage whether this is the case or not. Longer
+filenames can be accommodated by setting the macro NAME_SIZE in the header
+file global.h to a larger value.
+
+
+EARLY TERMINATION
+
+The program can be stopped gracefully by touching a file in the log directory
+with the same name as the log file but with extension .end instead of .log. It
+may take a while until the program exits, because it will only do so when the
+current field configuration is fully processed.

@@ -1,0 +1,23 @@
+
+********************************************************************************
+
+                     Molecular-dynamics auxiliary fields
+
+********************************************************************************
+
+
+Files
+-----
+
+fcom.c         Communication of the force variables residing at the
+               boundaries of the local lattices.
+
+mdflds.c       Allocation and initialization of the MD auxiliary fields.
+
+
+
+Include file
+------------
+
+The file mdflds.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

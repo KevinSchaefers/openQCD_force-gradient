@@ -1,0 +1,20 @@
+
+********************************************************************************
+
+         Special functions and simple programs related to statistics
+
+********************************************************************************
+
+chebyshev.c    Chebyshev approximation and integration of real functions.
+
+fsolve.c       General purpose equation solver and function minimizers.
+
+i0m.c          Computation of the modified Bessel function I_0(x).
+
+ks_test.c      Kolmogorov-Smirnov test.
+
+pchi_square.c  General Chi^2 distribution.
+
+stat.c         Collection of simple statistical analysis programs.
+
+Some further documentation can be found in the notes doc/stat_fcts.pdf.

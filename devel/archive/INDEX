@@ -1,0 +1,28 @@
+
+Saving/restoring field configurations to/from files.
+
+check1        Writing and reading of gauge, momentum and spinor fields.
+
+check2        Exporting and importing gauge, momentum and spinor fields.
+
+check3        Block-exporting and importing gauge, momentum and spinor fields.
+
+check4        Importing a previously exported gauge-field configuration
+              (possibly with anti-periodic/periodic extension).
+
+check5        Block-importing a previously block-exported gauge-field
+              configuration (possibly with anti-periodic/periodic extension).
+
+See main/README.io for a description of the different configuration storage
+types. The configuration directory structure assumed by the check programs
+is the one described in README.iodat.
+
+The programs check1,..,check5 accept the option -bc <type> that allows the
+type of boundary condition to be chosen (open boundary conditions are assumed
+if the option is not set). The programs check4 and check5 additionally accept
+the option -mask <int>, which permits to set the periodic-extension mask and
+the option -rmold that implies the removal of the saved gauge fields.
+
+On exit the program check1 deletes the saved fields, check2 and check3 too
+except for the gauge-field configuration, which may subsequently be read by
+check4 and check5,respectively.

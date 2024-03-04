@@ -1,0 +1,198 @@
+
+********************************************************************************
+
+           Configuration names, directories and I/O data
+
+********************************************************************************
+
+
+STORAGE TYPES
+
+Gauge, momentum and quark field configurations can be stored in different
+ways.
+
+1. Exported (type "e")
+
+Each configuration is written to a single file using the "export" functions
+in archive.c, marchive.c and sarchive.c.
+
+2. Block-exported (type "b")
+
+The lattice is divided into blocks and the field variables residing on each
+block are written to a file (i.e. there is one file per block and field) using
+the "blk_export" functions in archive.c, marchive.c and sarchive.c. The blocks
+must form a regular block lattice that divides the global lattice. Moreover,
+the block sizes must be integer multiples of the local lattice sizes, so that
+each local lattice is fully contained in one block.
+
+3. Local (type "l")
+
+In this case, each MPI process writes the local field to a file (i.e. there is
+one file per MPI process and field) using the "write" functions in archive.c,
+marchive.c and sarchive.c.
+
+For further details on the storage formats see main/README.io and the program
+files archive.c, marchive.c and sarchive.c.
+
+
+CONFIGURATION NAME AND DIRECTORY STRUCTURE
+
+0. Configuration base name
+
+The configuration file names are strings that usually begin with the name
+<nbase> of the simulation run in which the fields were produced. <nbase>
+is referred to as the configuration base name and can, in principle, be
+any string of letters and numbers.
+
+1. Configuration storage type "e"
+
+In this case, each field configuration is stored in a single file. The
+configuration file names of the gauge, momentum and pseudo-fermion fields are
+
+  <nbase>"n"<int>,
+  <nbase>"n"<int>.mom,
+  <nbase>"n"<int>.pf<int>,
+
+where the first integer is the configuration number and the second the pseudo-
+fermion number. Configuration numbers run from 1 in steps of 1. Independently
+of the internal labelling of the pseudo-fermion fields, the pseudo-fermion
+number attached to the file names runs from 0 to npf-1 in steps of 1, where
+npf is the number of allocated pseudo-fermion fields.
+
+2. Configuration storage type "b"
+
+The configuration directory is expected to contain subdirectories n/m/ in
+this case, where
+
+  n=0,1,..,nio_nodes-1,
+
+  m=0,1,..,(nb/nio_nodes)-1.
+
+Here nb denotes the number of blocks in the (global) lattice and nio_nodes is
+an integer in the range [1,nb] that must divide nb. The files containing the
+field variables on the block number ib are then stored in the directory with
+
+  n=ib/(nb/nio_nodes), m=ib%(nb/nio_nodes).
+
+The configuration file names of the gauge, momentum and pseudo-fermion fields
+are
+
+  <nbase>"n"<int>"_b"<int>,
+  <nbase>"n"<int>".mom_b"<int>,
+  <nbase>"n"<int>".pf"<int>"_b"<int>,
+
+where the last integer is the block index ib.
+
+3. Configuration storage type "l"
+
+The configuration directory is in this case expected to contain the
+subdirectories n/m/ with
+
+  n=0,1,..,nio_nodes-1,
+
+  m=0,1,..,(NPROC/nio_nodes)-1,
+
+where NPROC denotes the number of MPI processes and nio_nodes is an integer in
+the range [1,NPROC] that must divide NPROC. The configuration files written by
+the MPI process with rank r are then stored in the directory with
+
+  n=r/(NPROC/nio_nodes), m=r%(NPROC/nio_nodes).
+
+The configuration file names of the gauge, momentum and pseudo-fermion fields
+are
+
+  <nbase>"n"<int>"_"<int>,
+  <nbase>"n"<int>".mom_"<int>,
+  <nbase>"n"<int>".pf"<int>"_"<int>,
+
+where the last integer is the rank r of the MPI process.
+
+
+PARALLEL I/O
+
+In the case of storage type "b" and "l", the I/O programs are able to write
+and read configuration files in parallel. The number of parallel I/O streams,
+nio_streams, must be an integer in the range [1,N] and must divide N, where
+N=nb and N=NPROC, respectively, in the case of type "b" and "l".
+
+
+ELEMENTS OF THE iodat_t STRUCTURES
+
+The structures
+
+typedef struct
+{
+   int types;
+   int nb,ib,bs[4];
+   int nio_nodes,nio_streams;
+   char *cnfg_dir,*block_dir,*local_dir;
+} iodat_t;
+
+contain the information required to read or write configurations in the
+desired form. Their elements are:
+
+ types             Integer in the range [1,7] describing the storage types:
+    		   types&0x1!=0 => storage type "e",
+		   types&0x2!=0 => storage type "b",
+		   types&0x4!=0 => storage type "l".
+
+ nio_nodes         Parameter of the configuration directory structure.
+
+ nio_streams       Number of parallel I/O streams.
+
+ nb                Number of blocks in which the lattice is divided.
+
+ ib                Index of the block that contains the local lattice.
+
+ bs[4]             Block sizes.
+
+ cnfg_dir          Configuration directory (storage type "e").
+
+ block_dir         Configuration directory (storage type "b").
+
+ local_dir         Configuration directory (storage type "l").
+
+Depending on the storage types, some parameters are not required and
+are set to default values.
+
+
+INPUT PARAMETER SECTIONS
+
+The tags required in an input parameter section for fields that will
+be read from disk are:
+
+ type              <string> (one of the letters "e", "b" or "l")
+
+ cnfg_dir          <string> (only required for type "e")
+
+ block_dir         <string> (only required for type "b")
+
+ local_dir         <string> (only required for type "l")
+
+ nio_nodes         <int> (not required for type "e")
+
+ nio_streams       <int> (not required for type "e")
+
+In this case, a single storage "type" can be specified and the field
+configurations to be read are expected in the corresponding directory.
+
+The tags required in an input parameter section for fields that will
+be written to disk are:
+
+ types             <string> (string of the letters "e", "b", "l")
+
+ cnfg_dir          <string> (required if types includes "e")
+
+ block_dir         <string> (required if types includes "b")
+
+ local_dir         <string> (required if types includes "l")
+
+ bs                <int> <int> <int> <int> (required if types includes "b")
+
+ nio_nodes         <int> (required if types includes "b" or "l")
+
+ nio_streams       <int> (required if types includes "b" or "l")
+
+In this case, several storage "types" can be specified. If types="eb", for
+example, the configurations are written in exported and block-exported form
+to the specified directories.

@@ -1,0 +1,19 @@
+
+********************************************************************************
+
+                  Input parameter files for the program qcd1
+
+********************************************************************************
+
+48x24v1.in             HMC simulation of two-flavour QCD with Wilson plaquette
+                       action, traditional form of the O(a)-improvement terms,
+                       open boundary conditions, twisted-mass reweighting of the
+                       second kind and even-odd preconditioning. Parameters
+                       tuned for simulations of 48x24^3 lattices.
+
+64x32v1.in             HMC simulation of 2+1-flavour QCD with Iwasaki action,
+                       traditional form of the O(a)-improvement terms, open-SF
+                       boundary conditions, second kind of light-quark twisted-
+                       mass reweighting, even-odd preconditioning and parallel
+                       configuration I/O. Parameters tuned for simulations of
+                       64x32^3 lattices.

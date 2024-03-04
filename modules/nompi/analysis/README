@@ -1,0 +1,16 @@
+
+********************************************************************************
+
+                         Data analysis programs
+
+********************************************************************************
+
+bootstrap.c       Resampling programs.
+
+jack.c            Basic jackknife error analysis programs.
+
+jfit.c            Generic non-linear fits of statistical data.
+
+lsqfit.c          General least-squares fit program.
+
+polyfit.c         Least-squares polynomial fit of uncorrelated data.

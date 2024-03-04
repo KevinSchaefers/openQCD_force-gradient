@@ -1,0 +1,25 @@
+
+********************************************************************************
+
+                           Lattice Dirac Operator
+
+********************************************************************************
+
+
+Files
+-----
+
+Dw_bnd.c            Block boundary part of the Wilson-Dirac operator.
+
+Dw.c                Application of the O(a)-improved Wilson-Dirac operator Dw
+                    (single-precision programs).
+
+Dw_dble.c           Application of the O(a)-improved Wilson-Dirac operator Dw
+                    (double-precision programs).
+
+
+Include file
+------------
+
+The file dirac.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

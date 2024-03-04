@@ -1,0 +1,17 @@
+
+Little Dirac operator
+
+check1        Direct checks of Aw_dble() and Aw().
+
+check2        Consistency checks on Aw_dble(),..,Awhat().
+
+check3        Check of the program set_ltl_modes().
+
+time1         Timing of Awhat().
+
+time2         Timing of set_Awhat().
+
+All programs accept the options -bc <type> and -sw <type> that allow the type
+of the boundary conditions and the SW term to be chosen. The default choices
+(open boundary conditions, traditional SW term) apply if the options are not
+set.

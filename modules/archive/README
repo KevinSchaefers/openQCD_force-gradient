@@ -1,0 +1,27 @@
+
+********************************************************************************
+
+                    I/O functions for field configurations
+
+********************************************************************************
+
+
+Files
+-----
+
+archive.c        Programs to read and write gauge-field configurations.
+
+iodat.c          I/O utility programs for gauge, momentum and pseudo-
+                 fermion fields.
+
+marchive.c       Programs to read and write momentum-field configurations.
+
+sarchive.c       Programs to read and write global double-precision spinor
+                 fields.
+
+
+Include file
+------------
+
+The file archive.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

@@ -1,0 +1,29 @@
+
+********************************************************************************
+
+            Allocation and initialization of the global vector fields
+
+********************************************************************************
+
+
+Files
+-----
+
+vcom.c         Communication functions for the global single-precision
+               vector fields.
+
+vdcom.c        Communication functions for the global double-precision
+               vector fields.
+
+vflds.c        Allocation and initialization of the global vector fields
+               related to the deflation subspace.
+
+vinit.c        Generic initialization and assignment programs for complex
+               single- and double-precision fields.
+
+
+Include file
+------------
+
+The file vflds.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

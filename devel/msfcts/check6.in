@@ -1,0 +1,4 @@
+
+local_dir     /home/data/openQCD/loc   # Observable field directory.
+nio_nodes     2                        # Number of first level subdirectories.
+nio_streams   2                        # Number of parallel I/O streams.

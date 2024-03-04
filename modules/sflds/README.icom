@@ -1,0 +1,48 @@
+
+********************************************************************************
+
+                         COMMUNICATION FLAG icom
+
+********************************************************************************
+
+Many programs operating on spinor fields depend on two parameters, "vol" and
+"icom", in addition to the field addresses and possibly further parameters.
+While "vol" specifies the length of the field arrays, "icom" is a flag that
+steers the way the programs act in the MPI+OpenMP environment:
+
+icom=0:         This is the generic form of the program, which may be called
+                by any OpenMP thread and performs no communications. The
+		arguments passed to the program may be shared, private or
+		constant.
+
+icom=1:         The program is assumed to be simultaneously called by the
+                master threads on all MPI processes. If any, the computed
+		values (scalar products, etc.) are reduced to MPI process 0
+		and subsequently broadcast to all processes.
+
+icom=2:         The program is assumed to be called by the master threads on
+                any subset of MPI processes outside an OpenMP parallel region.
+		All arguments, including the field addresses, must be shared
+		or constant.
+                 On each MPI process, the program then executes a parallel
+		block, in which NTHREAD threads call the generic form of the
+		program with field addresses shifted by k*vol, where k is
+		the thread number. At the end of the parallel construct, the
+		computed values, if any, are reduced to the master thread
+		and returned to the calling program. No MPI communications
+		are performed.
+
+icom=3:         The program is assumed to be simultaneously called outside
+                an OpenMP parallel region by the master threads on all MPI
+		processes. All arguments, including the field addresses,
+		must be shared or constant.
+                 On each MPI process, the program then executes a parallel
+		block, in which NTHREAD threads call the generic form of the
+		program with field addresses shifted by k*vol, where k is
+		the thread number. At the end of the parallel construct, the
+		computed values, if any, are reduced to the master thread.
+		After that these values are reduced to MPI process 0 and
+		subsequently broadcast to all processes.
+
+If icom=0 or icom=1, the behaviour is the same as in openQCD-2.0 and earlier
+versions of openQCD.

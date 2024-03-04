@@ -1,0 +1,44 @@
+
+********************************************************************************
+
+                           Simulation algorithm
+
+********************************************************************************
+
+
+Files
+-----
+
+chrono.c       Propagation of solutions of the Dirac equation.
+
+counters.c     Solver iteration counters.
+
+hmc.c          HMC simulation algorithm.
+
+mdint.c        Integration of the molecular-dynamics equations.
+
+mdsteps.c      Molecular-dynamics integrator.
+
+msize.c        Size of the memory occupied by the simulation programs.
+
+rwrat.c        Rational function reweighting factor.
+
+rwtm.c         Twisted-mass reweighting factors.
+
+rwtmeo.c       Twisted-mass reweighting factors (even-odd preconditioned
+               version).
+
+sanity.c       Simulation parameter sanity checks.
+
+smd.c          SMD simulation algorithm.
+
+update.c       Molecular-dynamics elementary integration steps.
+
+wsize.c        Workspaces required for the simulations.
+
+
+Include file
+------------
+
+The file update.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.

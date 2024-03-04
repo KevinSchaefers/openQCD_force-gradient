@@ -1,0 +1,26 @@
+
+[Run name]
+name         Snoopy137
+
+[Configurations]
+type         e
+cnfg_dir     /data/qcd2/cnfg
+block_dir
+local_dir
+nio_nodes    12
+nio_streams  8
+first        1
+last         4
+step         1
+
+[Boundary conditions]
+type         0
+phi          0.937 0.389
+phi'         -0.283 1.23
+cG           1.0
+cG'          1.0
+
+[Wilson flow]
+nstep        100
+eps          0.02
+rule         3

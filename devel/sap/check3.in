@@ -1,0 +1,43 @@
+
+[Run name]
+name         Snoopy137
+
+[Configurations]
+type         e
+cnfg_dir     /data/qcd2/cnfg
+block_dir
+local_dir
+nio_nodes    12
+nio_streams  8
+first        1
+last         4
+step         1
+
+[Lattice parameters]
+kappa        0.1280
+isw          0
+csw          1.2
+mu           0.0123
+eoflg        1
+
+[Boundary conditions]
+type         0
+phi          0.12 -0.56
+phi'         0.92 0.76
+cG           1.0
+cG'          1.0
+cF           0.95
+cF'          0.90
+theta        0.34 -1.25 0.58
+
+[SAP]
+bs           4 4 4 4
+isolv        0
+nmr          4
+ncy          5
+
+[GCR]
+nkv          16
+nmx          128
+istop        0
+res          1.0e-12

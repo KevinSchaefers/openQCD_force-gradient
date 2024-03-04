@@ -1,0 +1,51 @@
+
+[Rational 0]
+degree    12
+range     0.001 7.9
+
+[Solver 0]
+solver       MSCG
+nmx          256
+istop        1
+res          1.0e-14
+
+[Solver 1]
+solver       SAP_GCR
+nmx          128
+istop        1
+nkv          16
+isolv        0
+nmr          4
+ncy          3
+res          1.0e-14
+
+[Solver 2]
+solver       DFL_SAP_GCR
+nmx          64
+istop        1
+nkv          16
+isolv        1
+nmr          4
+ncy          5
+res          1.0e-14
+
+[SAP]
+bs           4 4 4 4
+
+[Deflation subspace]
+bs           4 4 4 4
+Ns           8
+
+[Deflation subspace generation]
+kappa        0.1350
+mu           0.01
+ninv         5
+nmr          4
+ncy          5
+
+[Deflation projection]
+nkv          16
+nmx          64
+res          0.01
+nmx_gcr      24
+res_gcr      0.01
