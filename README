@@ -3,7 +3,55 @@
 
                         openQCD Simulation Programs
 
+     extended version including Hessian-free force-gradient integrators
+
 ********************************************************************************
+
+INTEGRATORS FOR MOLECULAR-DYNAMICS EQUATIONS
+
+This adapted version of the openQCD 2.4 code allows for nested hierarchical integrators 
+for the molecular-dynamics equations, based on any combination of Hessian-free 
+force-gradient integrators introduced in [Schaefers et al., 2024]. 
+
+This also includes the non-gradient algorithms of Omelyan-Mryglod-Folk (OMF) up to 6th order
+https://doi.org/10.1016/S0010-4655(02)00754-3. 
+
+The current coefficient sets are minimizing the (weighted) norm of the leading error coefficients. 
+The investigations have been made for Hessian-free force-gradient integrators on a single level, 
+similar to the investigations made in the aforementioned paper by Omelyan, Mryglod ad Folk. 
+For nested integrators, the optimization of the degrees of freedoms will most likely result in 
+different coefficients and is part of future research.
+
+
+CHANGES TO THE VERSION 2.4
+
+Compared to the openQCD package v2.4, the following files have been changed in order to enable 
+the use of Hessian-free force-gradient integrators:
+/include/flags.h
+/include/update.h
+/modules/flags/mdint_parms.c
+/modules/forces/force0.c
+/modules/update/mdint.c
+/modules/update/mdsteps.c
+/modules/update/wsize.c
+/modules/update/update.c
+
+Moreover, the check functions in /devel/update have been adapted so that the check functions 
+check1, check2 and check3 make use of the added Hessian-free force-gradient integrators.
+
+
+HOW TO USE THE NEW INTEGRATORS?
+
+The syntax of the input parameter files and the meaning of the various parameters did not change 
+and is described in some detail in main/README.infiles and doc/parms.pdf. To use the new 
+integrators in a nested integrator, one just has to change the "integrator" parameter in the 
+input parameter file. The integrators are named according to their abbreviations in 
+[Schaefers et al.,2024,Table 1]. For example, "BADAB" is the frequently used 
+five-stage Hessian-free force-gradient integrator with just one approximated gradient evaluation.
+The idea of approximating the force-gradient term has been introduced for this particular 
+integrator in https://doi.org/10.48550/arXiv.1111.5059 and a nested integrator based on this 
+Hessian-free force-gradient integrator has already been applied to the two-dimensional Schwinger 
+model, see https://doi.org/10.4208/cicp.OA-2016-0048.
 
 
 LATTICE THEORY
@@ -277,6 +325,9 @@ were introduced by Isabel Campos and the implementation of the "exponential"
 variant of the O(a) Pauli term was developed by Antonio Rago. Several modules
 were taken over from the DD-HMC program tree, which includes contributions
 from Luigi Del Debbio, Leonardo Giusti, Björn Leder and Filippo Palombi.
+This adapted version enabling the use of Hessian-free force-gradient integrators 
+is based on version 2.4 of the openQCD package and was written by Jacob Finkenrath
+and Kevin Schäfers. 
 
 
 ACKNOWLEDGEMENTS
@@ -285,7 +336,7 @@ In the course of the development of the openQCD code, many people suggested
 corrections and improvements or tested preliminary versions of the programs.
 The authors are particularly grateful to Isabel Campos, Dalibor Djukanovic,
 Georg Engel, Patrick Fritzsch, Leonardo Giusti, Björn Leder, Daniel Mohler,
-Carlos Pena and Hubert Simma for their communications and help.
+Carlos Pena and Hubert Simma for their communications and help. 
 
 
 LICENSE
@@ -296,7 +347,9 @@ The software may be used under the terms of the GNU General Public Licence
 
 BUG REPORTS
 
-If a bug is discovered, please send a report to <Martin.Luescher@cern.ch>.
+If a general bug in the openQCD package is discovered, please send a report 
+to <Martin.Luescher@cern.ch>. If a bug in the adapted files is discovered, 
+please send a report to <kschaefers@uni-wuppertal.de>.
 
 
 ALTERNATIVE PACKAGES AND COMPLEMENTARY PROGRAMS
