@@ -5,6 +5,7 @@
 *
 * Copyright (C) 2011-2018, 2020, 2022  Stefan Schaefer, Martin Luescher,
 *                                      John Bulava
+* 2024 Kevin Schaefers, Jacob Finkenrath
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
