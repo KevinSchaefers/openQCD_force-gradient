@@ -4,6 +4,7 @@
 * File flags.h
 *
 * Copyright (C) 2009-2014, 2016-2018, 2022 Martin Luescher, Isabel Campos
+* 2024 Kevin Schaefers, Jacob Finkenrath
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)

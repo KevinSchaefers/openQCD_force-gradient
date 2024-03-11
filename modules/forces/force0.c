@@ -4,6 +4,7 @@
 * File force0.c
 *
 * Copyright (C) 2005-2016, 2018, 2021 Martin Luescher, John Bulava
+* 2024 Kevin Schaefers, Jacob Finkenrath
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)

@@ -4,6 +4,7 @@
 * File mdint_parms.c
 *
 * Copyright (C) 2011, 2012, 2018 Martin Luescher
+* 2024 Kevin Schaefers, Jacob Finkenrath
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)

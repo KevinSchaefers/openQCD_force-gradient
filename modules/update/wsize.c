@@ -4,6 +4,7 @@
 * File wsize.c
 *
 * Copyright (C) 2017, 2018, 2021 Martin Luescher
+* 2024 Kevin Schaefers, Jacob Finkenrath
 *
 * This software is distributed under the terms of the GNU General Public
 * License (GPL)
