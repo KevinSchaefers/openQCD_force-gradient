@@ -11,7 +11,7 @@ INTEGRATORS FOR MOLECULAR-DYNAMICS EQUATIONS
 
 This adapted version of the openQCD 2.4 code allows for nested hierarchical integrators 
 for the molecular-dynamics equations, based on any combination of Hessian-free 
-force-gradient integrators introduced in <Schaefers et al., 2024>. 
+force-gradient integrators introduced in <https://doi.org/10.48550/arXiv.2403.10370>. 
 
 This also includes the non-gradient algorithms of Omelyan-Mryglod-Folk (OMF) up to 6th order
 <https://doi.org/10.1016/S0010-4655(02)00754-3>. 
@@ -46,7 +46,7 @@ The syntax of the input parameter files and the meaning of the various parameter
 and is described in some detail in main/README.infiles and doc/parms.pdf. To use the new 
 integrators in a nested integrator, one just has to change the "integrator" parameter in the 
 input parameter file. The integrators are named according to their abbreviations in 
-[<Schaefers et al.,2024>,Table 1]. For example, "BADAB" is the frequently used 
+[<https://doi.org/10.48550/arXiv.2403.10370>,Table 1]. For example, "BADAB" is the frequently used 
 five-stage Hessian-free force-gradient integrator with just one approximated gradient evaluation.
 The idea of approximating the force-gradient term has been introduced for this particular 
 integrator in <https://doi.org/10.48550/arXiv.1111.5059> and a nested integrator based on this 
