@@ -1231,7 +1231,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	 r[m].lvl_id=s[i].lvl_id;
 	 m+=1;
    }*/
-   int n,m,l,i,j;
+   /*int n,m,l,i,j;
    int index_mom_update_s, index_mom_update_r;
    mdstep_t *tmp;
    n=nfrc_steps(s);
@@ -1256,11 +1256,11 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   break;
 	}
 	index_mom_update_r = m-1;
-   }
+   }*/
 
    /* tmp will store the momentum update, as well as any operations belonging to force-gradient updates from r. 
       It will moreover already contain the momentum update from s, if it exists. */
-   if (index_mom_update_r >= 0)
+   /*if (index_mom_update_r >= 0)
    	tmp = (mdstep_t *)malloc((m - index_mom_update_r) * sizeof(mdstep_t));
    else 
 	tmp = (mdstep_t *)malloc(m * sizeof(mdstep_t));
@@ -1291,10 +1291,10 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	tmp[i].eps = r[i+index_mom_update_r].eps;
 	tmp[i].lvl_id = r[i+index_mom_update_r].lvl_id;
    }
-   l = m-index_mom_update_r;
+   l = m-index_mom_update_r;*/
 
    /* in a next step, we will add all force updates from s to r that do not belong to any force-gradient update */
-   for (i=0;i<index_mom_update_s;i++)
+   /*for (i=0;i<index_mom_update_s;i++)
    {	   
    	for (j=0;j<index_mom_update_r;j++)
 	{
@@ -1311,25 +1311,50 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 		r[j].lvl_id = s[i].lvl_id;
 		index_mom_update_r+=1;
 	}
-   }
+   }*/
 
    /* next, we will append the operations stored in tmp to r */
-   for (i=0;i<l;i++)
+   /*for (i=0;i<l;i++)
    {
 	r[index_mom_update_r].iop = tmp[i].iop;
 	r[index_mom_update_r].eps = tmp[i].eps;
 	r[index_mom_update_r].lvl_id = tmp[i].lvl_id;
 	index_mom_update_r+=1;
    }
-   free(tmp);	
+   free(tmp);	*/
 
    /* finally, we will append the operations from s that belong to force-gradient updates */
-   for (i=index_mom_update_s+1;i<n;i++)
+   /*for (i=index_mom_update_s+1;i<n;i++)
    {
 	r[index_mom_update_r].iop = s[i].iop;
 	r[index_mom_update_r].eps = c*s[i].eps;
 	r[index_mom_update_r].lvl_id = s[i].lvl_id;
 	index_mom_update_r+=1;
+   }*/
+
+   int n,m,i,j;
+
+   n=nfrc_steps(s);
+   m=nfrc_steps(r);
+
+   for (i=0;i<n;i++)
+   {
+      for (j=0;j<m;j++)
+      {
+         if (r[j].iop==s[i].iop)
+         {
+            r[j].eps+=c*s[i].eps;
+            break;
+         }
+      }
+
+      if (j==m)
+      {
+         r[j].iop=s[i].iop;
+         r[j].eps=c*s[i].eps;
+	 r[j].lvl_id=s[i].lvl_id;
+         m+=1;
+      }
    }
 }
 
