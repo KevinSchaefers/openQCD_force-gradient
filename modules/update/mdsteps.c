@@ -1219,7 +1219,7 @@ static int nall_steps(mdstep_t *s)
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-   int n,m,i;
+   /*int n,m,i;
 
    n=nfrc_steps(s);
    m=nfrc_steps(r);
@@ -1230,6 +1230,95 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	 r[m].eps=c*s[i].eps;
 	 r[m].lvl_id=s[i].lvl_id;
 	 m+=1;
+   }*/
+   int n,m,i,j;
+   int index_mom_update_s, index_mom_update_r;
+   mdstep_t *tmp;
+   n=nfrc_steps(s);
+   m=nfrc_steps(r);
+
+   for(i=0,i<n,i++)
+   {	   
+   	if(s[i].lvl_id != -1)
+   	{	   
+	   index_mom_update_s = i-1;
+	   break;
+	}
+   }
+   for(i=0,i<m,i++)
+   {	   
+   	if(r[i].lvl_id != -1)
+   	{	   
+	   index_mom_update_r = i-1;
+	   break;
+	}
+   }
+
+   /* tmp will store the momentum update, as well as any operations belonging to force-gradient updates from r. 
+      It will moreover already contain the momentum update from s, if it exists. */	
+   tmp = (mdstep_t *)malloc((m - index_mom_update_r) * sizeof(mdstep_t));
+
+   if (index_mom_update_r >= 0)
+   {
+	tmp[0].iop = r[index_mom_update_r].iop;
+	tmp[0].eps = r[index_mom_update_r].eps;
+	tmp[0].lvl_id = r[index_mom_update_r].lvl_id;
+	if (index_mom_update s>=0)
+	{
+   		tmp[0].eps += c*s[index_mom_update_s].eps;
+	}	
+   }   
+   else if (index_mom_update_s >= 0)
+   {
+	tmp[0].iop = s[index_mom_update_s].iop;
+	tmp[0].eps = c*s[index_mom_update_s].eps;
+	tmp[0].lvl_id = s[index_mom_update_s].lvl_id;   
+   }   
+
+   for (i=1;i<m-index_mom_update_r;i++)
+   {
+	tmp[i].iop = r[i+index_mom_update_r].iop;
+	tmp[i].eps = r[i+index_mom_update_r].eps;
+	tmp[i].lvl_id = r[i+index_mom_update_r].lvl_id;
+   }
+
+   /* in a next step, we will add all force updates from s to r that do not belong to any force-gradient update */
+   for (i=0;i<index_mom_update_s;i++)
+   {	   
+   	for (j=0;j<index_mom_update_r;j++)
+	{
+		if (r[j].iop == s[i].iop)
+		{
+			r[j].eps += c*s[i].eps;
+			break;
+		}	
+	}
+	if (j==index_mom_update_r)
+	{
+		r[j].iop = s[i].iop;
+		r[j].eps = c*s[i].eps;
+		r[j].lvl_id = s[i].lvl_id;
+		index_mom_update_r+=1;
+	}
+   }
+
+   /* next, we will append the operations stored in tmp to r */
+   for (i=0;i<m-index_mom_update_r;i++)
+   {
+	r[index_mom_update_r].iop = tmp[i].iop;
+	r[index_mom_update_r].eps = tmp[i].eps;
+	r[index_mom_update_r].lvl_id = tmp[i].lvl_id;
+	index_mom_update_r+=1;
+   }
+   free(tmp);	
+
+   /* finally, we will append the operations from s that belong to force-gradient updates */
+   for (i=index_mom_update_s+1;i<n;i++)
+   {
+	r[index_mom_update_r].iop = s[i].iop;
+	r[index_mom_update_r].eps = c*s[i].eps;
+	r[index_mom_update_r].lvl_id = s[i].lvl_id;
+	index_mom_update_r+=1;
    }
 }
 
