@@ -1231,7 +1231,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	 r[m].lvl_id=s[i].lvl_id;
 	 m+=1;
    }*/
-   int n,m,i,j;
+   int n,m,l,i,j;
    int index_mom_update_s, index_mom_update_r;
    mdstep_t *tmp;
    n=nfrc_steps(s);
@@ -1246,9 +1246,8 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   index_mom_update_s = i-1;
 	   break;
 	}
-   }
-   if (i==n)
    	index_mom_update_s = n-1;
+   }
    for(i=0;i<m;i++)
    {	   
    	if(r[i].lvl_id != -1)
@@ -1256,9 +1255,8 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   index_mom_update_r = i-1;
 	   break;
 	}
-   }
-   if (i==m)
 	index_mom_update_r = m-1;
+   }
 
    /* tmp will store the momentum update, as well as any operations belonging to force-gradient updates from r. 
       It will moreover already contain the momentum update from s, if it exists. */
@@ -1293,6 +1291,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	tmp[i].eps = r[i+index_mom_update_r].eps;
 	tmp[i].lvl_id = r[i+index_mom_update_r].lvl_id;
    }
+   l = m-index_mom_update;
 
    /* in a next step, we will add all force updates from s to r that do not belong to any force-gradient update */
    for (i=0;i<index_mom_update_s;i++)
@@ -1315,7 +1314,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
    }
 
    /* next, we will append the operations stored in tmp to r */
-   for (i=0;i<m-index_mom_update_r;i++)
+   for (i=0;i<l;i++)
    {
 	r[index_mom_update_r].iop = tmp[i].iop;
 	r[index_mom_update_r].eps = tmp[i].eps;
