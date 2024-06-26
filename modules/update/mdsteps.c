@@ -1237,7 +1237,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
    n=nfrc_steps(s);
    m=nfrc_steps(r);
 
-   for(i=0,i<n,i++)
+   for(i=0;i<n;i++)
    {	   
    	if(s[i].lvl_id != -1)
    	{	   
@@ -1245,7 +1245,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   break;
 	}
    }
-   for(i=0,i<m,i++)
+   for(i=0;i<m;i++)
    {	   
    	if(r[i].lvl_id != -1)
    	{	   
@@ -1263,7 +1263,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	tmp[0].iop = r[index_mom_update_r].iop;
 	tmp[0].eps = r[index_mom_update_r].eps;
 	tmp[0].lvl_id = r[index_mom_update_r].lvl_id;
-	if (index_mom_update s>=0)
+	if (index_mom_update_s>=0)
 	{
    		tmp[0].eps += c*s[index_mom_update_s].eps;
 	}	
