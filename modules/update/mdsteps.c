@@ -1247,6 +1247,8 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   break;
 	}
    }
+   if (i==n)
+   	index_mom_update_s = n-1;
    for(i=0;i<m;i++)
    {	   
    	if(r[i].lvl_id != -1)
@@ -1255,6 +1257,8 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	   break;
 	}
    }
+   if (i==m)
+	index_mom_update_r = m-1;
 
    /* tmp will store the momentum update, as well as any operations belonging to force-gradient updates from r. 
       It will moreover already contain the momentum update from s, if it exists. */
