@@ -1291,7 +1291,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 	tmp[i].eps = r[i+index_mom_update_r].eps;
 	tmp[i].lvl_id = r[i+index_mom_update_r].lvl_id;
    }
-   l = m-index_mom_update;
+   l = m-index_mom_update_r;
 
    /* in a next step, we will add all force updates from s to r that do not belong to any force-gradient update */
    for (i=0;i<index_mom_update_s;i++)
