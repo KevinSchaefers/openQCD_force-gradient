@@ -1216,97 +1216,34 @@ static int nall_steps(mdstep_t *s)
    return n;
 }
 
-static void swap_steps(mdstep_t *s,mdstep_t *r)
-{
-   int is;
-   double rs;
-
-   is=(*s).iop;
-   (*s).iop=(*r).iop;
-   (*r).iop=is;
-
-   rs=(*s).eps;
-   (*s).eps=(*r).eps;
-   (*r).eps=rs;
-    
-   is=(*s).lvl_id;
-   (*s).lvl_id=(*r).lvl_id;
-   (*r).lvl_id=is;
-}
-
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
    int n,m,i,j;
-   mdstep_t *tmp;
 
-   n=nfrc_steps(s);
-   m=nfrc_steps(r);
-    
-   tmp = (mdstep_t *)malloc((m+n) * sizeof(mdstep_t));
-    
-   for (j=0;j<m;j++)
-   {
-       tmp[j].iop = r[j].iop;
-       tmp[j].eps = r[j].eps;
-       tmp[j].lvl_id = r[j].lvl_id;
-   }
-    
-   for (i=0;i<n;i++)
-   {
+    n=nfrc_steps(s);
+    m=nfrc_steps(r);
+
+    for (i=0;i<n;i++)
+    {
        for (j=0;j<m;j++)
        {
-           if (tmp[j].iop==s[i].iop && tmp[j].lvl_id == s[i].lvl_id && tmp[j].lvl_id == -1)
-           {
-               tmp[j].eps+=c*s[i].eps;
-               break;
-           }
+          if (r[j].iop==s[i].iop && r[j].lvl_id = s[i].lvl_id && r[j].lvl_id == -1)
+          {
+             r[j].eps+=c*s[i].eps;
+             break;
+          }
        }
-       
+
        if (j==m)
        {
-           tmp[j].iop=s[i].iop;
-           tmp[j].eps=c*s[i].eps;
-           tmp[j].lvl_id=s[i].lvl_id;
-           m+=1;
+          r[j].iop=s[i].iop;
+          r[j].eps=c*s[i].eps;
+          m+=1;
        }
-   }
-    
-    for (i=1;i<=m;i++)
-    {
-        if (tmp[m-i].iop < iend-4 && tmp[m-i].lvl_id == -1)
-        {
-            j = 1;
-            while(m-(i+j) >= 0)
-            {
-                swap_steps(tmp+m-(i+j)+1,tmp+m-(i+j));
-                j+=1;
-            }
-        }
     }
-    
-    j=0;
-    while (tmp[j].iop != iend-4)
-    {
-        r[j].iop = tmp[j].iop;
-        r[j].eps = tmp[j].eps;
-        r[j].lvl_id = tmp[j].lvl_id;
-        j+=1;
-    }
-    r[j].iop = tmp[j].iop;
-    r[j].eps = tmp[j].eps;
-    r[j].lvl_id = tmp[j].lvl_id;
-    j+=1;
-    for (i=j+1;i<m;i++)
-    {
-        if (tmp[i].iop != iend-4)
-        {
-            r[j].iop = tmp[i].iop;
-            r[j].eps = tmp[i].eps;
-            r[j].lvl_id = tmp[i].lvl_id;
-            j+=1;
-        }
-    }
-    free(tmp);
+    r[m].iop=iend-4;
+    r[m].eps=0.0;
+    r[m].lvl_id=-1;
 }
 
 
