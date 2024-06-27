@@ -1216,9 +1216,27 @@ static int nall_steps(mdstep_t *s)
    return n;
 }
 
+static void swap_steps(mdstep_t *s,mdstep_t *r)
+{
+   int is;
+   double rs;
+
+   is=(*s).iop;
+   (*s).iop=(*r).iop;
+   (*r).iop=is;
+
+   rs=(*s).eps;
+   (*s).eps=(*r).eps;
+   (*r).eps=rs;
+    
+   is=(*s).lvl_id;
+   (*s).lvl_id=(*r).lvl_id;
+   (*r).lvl_id=lvl_id;
+}
+
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-   int n,m,i,j;
+    int n,m,i,j;
 
     n=nfrc_steps(s);
     m=nfrc_steps(r);
@@ -1227,7 +1245,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
     {
        for (j=0;j<m;j++)
        {
-          if (r[j].iop==s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id == -1)
+          if (r[j].iop==s[i].iop && r[j].lvl_id = s[i].lvl_id && r[j].lvl_id == -1)
           {
              r[j].eps+=c*s[i].eps;
              break;
@@ -1241,9 +1259,30 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
           m+=1;
        }
     }
-    r[m].iop=iend-4;
-    r[m].eps=0.0;
-    r[m].lvl_id=-1;
+    
+    /* optimization block starts here */
+    for (j=m-1;j>=0;j--)
+    {
+        if (r[j].iop == iend-4)
+            break;
+        else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
+        {
+            i = 1;
+            while (r[j-i].iop != iend-4)
+            {
+                swap_steps(r+j-i+1,r+j-i);
+                i+=1;
+            }
+            swap_steps(r+j-i+1,r+j-i);
+        }
+    }
+    
+    /*if (r[m-1].iop < iend-4)
+    {
+        r[m].iop=itu-3;
+        r[m].eps=0.0;
+        r[m].lvl_id=-1;
+    }*/
 }
 
 
