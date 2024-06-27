@@ -1261,12 +1261,12 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
     }
     
     /* optimization block starts here */
-    for (j=m-1;j>=0;j--)
+    for (j=m-1;j>0;j--)
     {
 	if (r[j].iop == iend-4)	 
 	{
 		i=1;
-		while(j-i > 0)
+		while(j-i >= 0)
 		{
 			swap_steps(r+j-i+1,r+j-i);
 			i+=1;
@@ -1274,7 +1274,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 		break;
 	}
     }
-    for (j=m-1;j>=0;j--)
+    for (j=m-1;j>0;j--)
     {
         if (r[j].iop == iend-4)
             break;
