@@ -1219,143 +1219,77 @@ static int nall_steps(mdstep_t *s)
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-   /*int n,m,i;
-
-   n=nfrc_steps(s);
-   m=nfrc_steps(r);
-
-   for (i=0;i<n;i++)
-   {
-	 r[m].iop=s[i].iop;
-	 r[m].eps=c*s[i].eps;
-	 r[m].lvl_id=s[i].lvl_id;
-	 m+=1;
-   }*/
-   int n,m,l,i,j;
-   int index_mom_update_s, index_mom_update_r;
+   int n,m,i,j;
    mdstep_t *tmp;
-   n=nfrc_steps(s);
-   m=nfrc_steps(r);
-   index_mom_update_s = 0;
-   index_mom_update_r = 0;
-
-   for(i=0;i<n;i++)
-   {	   
-   	if(s[i].lvl_id != -1)
-   	{	   
-	   index_mom_update_s = i-1;
-	   break;
-	}
-   	index_mom_update_s = n-1;
-   }
-   for(i=0;i<m;i++)
-   {	   
-   	if(r[i].lvl_id != -1)
-   	{	   
-	   index_mom_update_r = i-1;
-	   break;
-	}
-	index_mom_update_r = m-1;
-   }
-
-   /* tmp will store the momentum update, as well as any operations belonging to force-gradient updates from r. 
-      It will moreover already contain the momentum update from s, if it exists. */
-   if (index_mom_update_r >= 0)
-   	tmp = (mdstep_t *)malloc((m - index_mom_update_r) * sizeof(mdstep_t));
-   else 
-	tmp = (mdstep_t *)malloc(m * sizeof(mdstep_t));
-
-   if (index_mom_update_r >= 0)
-   {
-	tmp[0].iop = r[index_mom_update_r].iop;
-	tmp[0].eps = r[index_mom_update_r].eps;
-	tmp[0].lvl_id = r[index_mom_update_r].lvl_id;
-	if (index_mom_update_s>=0)
-	{
-   		tmp[0].eps += c*s[index_mom_update_s].eps;
-	}	
-   }   
-   else if (index_mom_update_s >= 0)
-   {
-	tmp[0].iop = s[index_mom_update_s].iop;
-	tmp[0].eps = c*s[index_mom_update_s].eps;
-	tmp[0].lvl_id = s[index_mom_update_s].lvl_id;   
-   }   
-
-   if (index_mom_update_r == -1)
-	index_mom_update_r = 0;
-
-   for (i=1;i<m-index_mom_update_r;i++)
-   {
-	tmp[i].iop = r[i+index_mom_update_r].iop;
-	tmp[i].eps = r[i+index_mom_update_r].eps;
-	tmp[i].lvl_id = r[i+index_mom_update_r].lvl_id;
-   }
-   l = m-index_mom_update_r;
-
-   /* in a next step, we will add all force updates from s to r that do not belong to any force-gradient update */
-   for (i=0;i<index_mom_update_s;i++)
-   {	   
-   	for (j=0;j<index_mom_update_r;j++)
-	{
-		if (r[j].iop == s[i].iop)
-		{
-			r[j].eps += c*s[i].eps;
-			break;
-		}	
-	}
-	if (j==index_mom_update_r)
-	{
-		r[j].iop = s[i].iop;
-		r[j].eps = c*s[i].eps;
-		r[j].lvl_id = s[i].lvl_id;
-		index_mom_update_r+=1;
-	}
-   }
-
-   /* next, we will append the operations stored in tmp to r */
-   for (i=0;i<l;i++)
-   {
-	r[index_mom_update_r].iop = tmp[i].iop;
-	r[index_mom_update_r].eps = tmp[i].eps;
-	r[index_mom_update_r].lvl_id = tmp[i].lvl_id;
-	index_mom_update_r+=1;
-   }
-   free(tmp);	
-
-   /* finally, we will append the operations from s that belong to force-gradient updates */
-   for (i=index_mom_update_s+1;i<n;i++)
-   {
-	r[index_mom_update_r].iop = s[i].iop;
-	r[index_mom_update_r].eps = c*s[i].eps;
-	r[index_mom_update_r].lvl_id = s[i].lvl_id;
-	index_mom_update_r+=1;
-   }
-
-   /*int n,m,i,j;
 
    n=nfrc_steps(s);
    m=nfrc_steps(r);
-
+    
+   tmp = (mdstep_t *)malloc((m+n) * sizeof(mdstep_t));
+    
+   for (j=0;j<m;j++)
+   {
+       tmp[j].iop = r[j].iop;
+       tmp[j].eps = r[j].eps;
+       tmp[j].lvl_id = r[j].lvl_id;
+   }
+    
    for (i=0;i<n;i++)
    {
-      for (j=0;j<m;j++)
-      {
-         if (r[j].iop==s[i].iop)
-         {
-            r[j].eps+=c*s[i].eps;
-            break;
-         }
-      }
-
-      if (j==m)
-      {
-         r[j].iop=s[i].iop;
-         r[j].eps=c*s[i].eps;
-	 r[j].lvl_id=s[i].lvl_id;
-         m+=1;
-      }
-   }*/
+       for (j=0;j<m;j++)
+       {
+           if (tmp[j].iop==s[i].iop && tmp[j].lvl_id == s[i].lvl_id && tmp[j].lvl_id == -1)
+           {
+               tmp[j].eps+=c*s[i].eps;
+               break;
+           }
+       }
+       
+       if (j==m)
+       {
+           tmp[j].iop=s[i].iop;
+           tmp[j].eps=c*s[i].eps;
+           tmp[j].lvl_id=s[i].lvl_id;
+           m+=1;
+       }
+   }
+    
+    for (i=1;i<=m;i++)
+    {
+        if (tmp[m-i].iop < iend-4 && tmp[m-i].lvl_id == -1)
+        {
+            j = 1;
+            while(m-(i+j) >= 0)
+            {
+                swap_steps(tmp+m-(i+j)+1,tmp+m-(i+j));
+                j+=1;
+            }
+        }
+    }
+    
+    j=0;
+    while (tmp[j].iop != iend-4)
+    {
+        r[j].iop = tmp[j].iop;
+        r[j].eps = tmp[j].eps;
+        r[j].lvl_id = tmp[j].lvl_id;
+        j+=1;
+    }
+    r[j].iop = tmp[j].iop;
+    r[j].eps = tmp[j].eps;
+    r[j].lvl_id = tmp[j].lvl_id;
+    j+=1;
+    for (i=j+1;i<m;i++)
+    {
+        if (tmp[i].iop != iend-4)
+        {
+            r[j].iop = tmp[i].iop;
+            r[j].eps = tmp[i].eps;
+            r[j].lvl_id = tmp[i].lvl_id;
+            j+=1;
+        }
+    }
+    free(tmp);
 }
 
 
@@ -1385,6 +1319,24 @@ static void insert_level(mdstep_t *s1,mdstep_t *s2,mdstep_t *r)
       add_frc_steps(1.0,s2,r);
       s2+=nfrc_steps(s2);
    }
+}
+
+static void swap_steps(mdstep_t *s,mdstep_t *r)
+{
+   int is;
+   double rs;
+
+   is=(*s).iop;
+   (*s).iop=(*r).iop;
+   (*r).iop=is;
+
+   rs=(*s).eps;
+   (*s).eps=(*r).eps;
+   (*r).eps=rs;
+    
+   is=(*s).lvl_id;
+   (*s).lvl_id=(*r).lvl_id;
+   (*r).lvl_id=is;
 }
 
 static void set_nlv(int *nlv,double *tau)
