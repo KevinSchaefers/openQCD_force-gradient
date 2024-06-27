@@ -1216,6 +1216,23 @@ static int nall_steps(mdstep_t *s)
    return n;
 }
 
+static void swap_steps(mdstep_t *s,mdstep_t *r)
+{
+   int is;
+   double rs;
+
+   is=(*s).iop;
+   (*s).iop=(*r).iop;
+   (*r).iop=is;
+
+   rs=(*s).eps;
+   (*s).eps=(*r).eps;
+   (*r).eps=rs;
+    
+   is=(*s).lvl_id;
+   (*s).lvl_id=(*r).lvl_id;
+   (*r).lvl_id=is;
+}
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
@@ -1319,24 +1336,6 @@ static void insert_level(mdstep_t *s1,mdstep_t *s2,mdstep_t *r)
       add_frc_steps(1.0,s2,r);
       s2+=nfrc_steps(s2);
    }
-}
-
-static void swap_steps(mdstep_t *s,mdstep_t *r)
-{
-   int is;
-   double rs;
-
-   is=(*s).iop;
-   (*s).iop=(*r).iop;
-   (*r).iop=is;
-
-   rs=(*s).eps;
-   (*s).eps=(*r).eps;
-   (*r).eps=rs;
-    
-   is=(*s).lvl_id;
-   (*s).lvl_id=(*r).lvl_id;
-   (*r).lvl_id=is;
 }
 
 static void set_nlv(int *nlv,double *tau)
