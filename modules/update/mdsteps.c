@@ -1231,7 +1231,7 @@ static void swap_steps(mdstep_t *s,mdstep_t *r)
     
    is=(*s).lvl_id;
    (*s).lvl_id=(*r).lvl_id;
-   (*r).lvl_id=lvl_id;
+   (*r).lvl_id=is;
 }
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
@@ -1245,7 +1245,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
     {
        for (j=0;j<m;j++)
        {
-          if (r[j].iop==s[i].iop && r[j].lvl_id = s[i].lvl_id && r[j].lvl_id == -1)
+          if (r[j].iop==s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id == -1)
           {
              r[j].eps+=c*s[i].eps;
              break;
