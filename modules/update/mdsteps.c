@@ -1228,7 +1228,7 @@ static void swap_steps(mdstep_t *s,mdstep_t *r)
    rs=(*s).eps;
    (*s).eps=(*r).eps;
    (*r).eps=rs;
-    
+
    is=(*s).lvl_id;
    (*s).lvl_id=(*r).lvl_id;
    (*r).lvl_id=is;
@@ -1236,11 +1236,14 @@ static void swap_steps(mdstep_t *s,mdstep_t *r)
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-    int n,m,i,j;
-
+    int n,m,i,j,mom_update_exists;
+    mom_update_exists=0;
     n=nfrc_steps(s);
     m=nfrc_steps(r);
 
+    /* the following nested loop adds s to r. If an operation in s is a force or momentum update with lvl_id=-1,
+       i.e. it does not belong to a force-gradient update, then we may just add the step size to the same operation
+       in r (if it exists). Otherwise, the operation is added to the end of r.*/
     for (i=0;i<n;i++)
     {
        for (j=0;j<m;j++)
@@ -1256,49 +1259,57 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
        {
           r[j].iop=s[i].iop;
           r[j].eps=c*s[i].eps;
+          r[j].lvl_id = s[i].lvl_id;
           m+=1;
        }
     }
-    
-    /* optimization block starts here */
-    for (j=m-1;j>0;j--)
-    {
-	if (r[j].iop == iend-4)	 
-	{
-		i=1;
-		while(j-i >= 0)
-		{
-			swap_steps(r+j-i+1,r+j-i);
-			i+=1;
-		}
-		break;
-	}
-    }
-    for (j=m-1;j>0;j--)
+
+    /* the next for loop searches for the momentum update operation (itu-3) and makes it the first operation in r */	
+    for (j=m-1;j>=0;j--)
     {
         if (r[j].iop == iend-4)
-            break;
-        else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
         {
-            i = 1;
-            while (r[j-i].iop != iend-4 && (j-i) >= 0)
-            {
-                swap_steps(r+j-i+1,r+j-i);
-                i+=1;
-            }
-	    if (j-i >= 0)
-	    {
-            	swap_steps(r+j-i+1,r+j-i);
-	    }
+                i=1;
+                while(j-i >= 0)
+                {
+                        swap_steps(r+j-i+1,r+j-i);
+                        i+=1;
+                }
+                mom_update_exists=1; /* there are not only force-gradient updates, i.e. we have to sort */
+                break;
         }
     }
-    
-    /*if (r[m-1].iop < iend-4)
+	
+    if (mom_update_exists == 1)
     {
-        r[m].iop=itu-3;
-        r[m].eps=0.0;
-        r[m].lvl_id=-1;
-    }*/
+	    /* sort the operations so that 
+     	  	1) force-updates that do not belong to force-gradient updates
+	 	2) momentum update (itu-3) 
+   		3) force-gradient updates */
+	    for (j=m-1;j>0;j--)
+	    {
+	        if (r[j].iop == iend-4)
+		   /* all force updates that do not belong to a force-gradient update are in front of the momentum
+      			update. We can stop sorting. */
+	            break;
+	        else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
+	        {
+		    /* we found a force update that has to appear in front of the momentum update. Thus we swap the 
+      			present operation with its predecessor until it has been swapped with the momentum update */
+	            i = 1;
+	            while (j-i >= 0)
+	            {
+	                swap_steps(r+j-i+1,r+j-i);
+	                if (r[j-i+1].iop == iend-4)
+	                {
+	                        j+=1;
+	                        break;
+	                }
+	                i+=1;
+	            }
+	        }
+	    }
+    }
 }
 
 
