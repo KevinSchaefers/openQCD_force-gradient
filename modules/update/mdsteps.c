@@ -1253,22 +1253,29 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
              r[j].eps+=c*s[i].eps;
              break;
           }
-	  else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
-	  {
-		/* we found a force update that has to appear in front of the momentum update. Thus we swap the 
-      		present operation with its predecessor until it has been swapped with the momentum update */
-          	i = 1;
-	        while (j-i >= 0)
-	        {
-	            swap_steps(r+j-i+1,r+j-i);
-	            if (r[j-i+1].iop == iend-4)
-	            {
-	                j+=1;
-	                break;
-	            }
-	            i+=1;
-	        }
-	  }		
+          else if (r[j].iop == s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == s[i].eps)
+          {
+              /* there are two force-gradient updates that we can merge sind the temporary updates of the link field use the same step size */
+              /* first, we skip all force updates for the temporary link update */
+              while (s[i].iop != iend-3)
+              {
+                  i+=1;
+              }
+              while (r[j].iop != iend-3)
+              {
+                  j+=1;
+              }
+              /* second, we also skip the operation creating a copy of the link field */
+              i+=1; j+=1;
+              /* now, we can sum up the step sizes of the forces*/
+              while (s[i].iop != iend-2)
+              {
+                  r[j].eps+=c*s[i].eps;
+                  i+=1; j+=1;
+              }
+              /* finally, we skip the momentum update that also restores the link field */
+              i+=1; j+=1;
+          }
        }
 
        if (j==m)
