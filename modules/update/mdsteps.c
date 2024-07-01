@@ -1253,9 +1253,9 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
              r[j].eps+=c*s[i].eps;
              break;
           }
-          else if (r[j].iop == s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == s[i].eps)
+          else if (r[j].iop < iend-4 && s[i].iop < iend-4 && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == c*s[i].eps)
           {
-              /* there are two force-gradient updates that we can merge sind the temporary updates of the link field use the same step size */
+              /* there are two force-gradient updates that we can merge since the temporary updates of the link field use the same step size */
               /* first, we skip all force updates for the temporary link update */
               while (s[i].iop != iend-3)
               {
@@ -1273,8 +1273,9 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
                   r[j].eps+=c*s[i].eps;
                   i+=1; j+=1;
               }
-              /* finally, we skip the momentum update that also restores the link field */
-              i+=1; j+=1;
+              /* we are now done with merging the two force-gradient updates. The current operation s[i] is performing the momentum update 
+	       * + restoring the link field. This is already in r so that we can skip this operation. */
+              break;
           }
        }
 
