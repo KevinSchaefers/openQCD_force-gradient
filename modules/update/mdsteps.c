@@ -1216,21 +1216,124 @@ static int nall_steps(mdstep_t *s)
    return n;
 }
 
+static void swap_steps(mdstep_t *s,mdstep_t *r)
+{
+   int is;
+   double rs;
+
+   is=(*s).iop;
+   (*s).iop=(*r).iop;
+   (*r).iop=is;
+
+   rs=(*s).eps;
+   (*s).eps=(*r).eps;
+   (*r).eps=rs;
+
+   is=(*s).lvl_id;
+   (*s).lvl_id=(*r).lvl_id;
+   (*r).lvl_id=is;
+}
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-   int n,m,i;
+    int n,m,i,j,mom_update_exists;
+    mom_update_exists=0;
+    n=nfrc_steps(s);
+    m=nfrc_steps(r);
 
-   n=nfrc_steps(s);
-   m=nfrc_steps(r);
+    /* the following nested loop adds s to r. If an operation in s is a force or momentum update with lvl_id=-1,
+       i.e. it does not belong to a force-gradient update, then we may just add the step size to the same operation
+       in r (if it exists). Otherwise, the operation is added to the end of r.*/
+    for (i=0;i<n;i++)
+    {
+       for (j=0;j<m;j++)
+       {
+          if (r[j].iop==s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id == -1)
+          {
+             r[j].eps+=c*s[i].eps;
+             break;
+          }
+          else if (r[j].iop < iend-4 && s[i].iop < iend-4 && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == c*s[i].eps)
+          {
+              /* there are two force-gradient updates that we can merge since the temporary updates of the link field use the same step size */
+              /* first, we skip all force updates for the temporary link update */
+              while (s[i].iop != iend-3)
+              {
+                  i+=1;
+              }
+              while (r[j].iop != iend-3)
+              {
+                  j+=1;
+              }
+              /* second, we also skip the operation creating a copy of the link field */
+              i+=1; j+=1;
+              /* now, we can sum up the step sizes of the forces*/
+              while (s[i].iop != iend-2)
+              {
+                  r[j].eps+=c*s[i].eps;
+                  i+=1; j+=1;
+              }
+              /* we are now done with merging the two force-gradient updates. The current operation s[i] is performing the momentum update 
+	       * + restoring the link field. This is already in r so that we can skip this operation. */
+              break;
+          }
+       }
 
-   for (i=0;i<n;i++)
-   {
-	 r[m].iop=s[i].iop;
-	 r[m].eps=c*s[i].eps;
-	 r[m].lvl_id=s[i].lvl_id;
-	 m+=1;
-   }
+       if (j==m)
+       {
+          r[j].iop=s[i].iop;
+          r[j].eps=c*s[i].eps;
+          r[j].lvl_id = s[i].lvl_id;
+          m+=1;
+       }
+    }
+
+    /* the next for loop searches for the momentum update operation (itu-3) and makes it the first operation in r */	
+    for (j=m-1;j>=0;j--)
+    {
+        if (r[j].iop == iend-4)
+        {
+                i=1;
+                while(j-i >= 0)
+                {
+                        swap_steps(r+j-i+1,r+j-i);
+                        i+=1;
+                }
+                mom_update_exists=1; /* there are not only force-gradient updates, i.e. we have to sort */
+                break;
+        }
+    }
+	
+    if (mom_update_exists == 1)
+    {
+	    /* sort the operations so that 
+     	  	1) force-updates that do not belong to force-gradient updates
+	 	2) momentum update (itu-3) 
+   		3) force-gradient updates */
+	    for (j=m-1;j>0;j--)
+	    {
+	        if (r[j].iop == iend-4)
+		   /* all force updates that do not belong to a force-gradient update are in front of the momentum
+      			update. We can stop sorting. */
+	            break;
+	        else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
+	        {
+		    /* we found a force update that has to appear in front of the momentum update. Thus we swap the 
+      			present operation with its predecessor until it has been swapped with the momentum update */
+	            i = 1;
+	            while (j-i >= 0)
+	            {
+	                swap_steps(r+j-i+1,r+j-i);
+	                if (r[j-i+1].iop == iend-4)
+	                {
+	                        j+=1;
+	                        break;
+	                }
+	                i+=1;
+	            }
+	        }
+	    }
+    }
 }
 
 
