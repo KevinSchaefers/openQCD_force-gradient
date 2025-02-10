@@ -1418,6 +1418,200 @@ mdstep_t *mdsteps(int *nop,int *itu)
    return mds;
 }
 
+double* get_linkupdate_weights(int ilv)
+{
+       mdp=mdint_parms(ilv);
+       int d_a;
+       double *a;
+       d_a = 0;
+       
+       if (mdp.integrator==BAB || mdp.integrator==LPFR)
+       {
+           d_a = 1; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.0;
+       }
+       else if (mdp.integrator==ABA)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==DAD)
+       {
+           d_a = 1; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.0;
+       }
+       else if (mdp.integrator==ADA)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==BABAB || mdp.integrator==OMF2)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==ABABA)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.1931833275037836; a[1] = 0.613633344992433; a[2] = 0.1931833275037836;
+       }
+       else if (mdp.integrator==BADAB)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==DABAD)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==DADAD)
+       {
+           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
+       }
+       else if (mdp.integrator==ADADA)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.211324865405187; a[1] = 0.577350269189626; a[2] = 0.211324865405187;
+       }
+       else if (mdp.integrator==ABABABA)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.675603595979829; a[1] = -0.175603595979829; a[2] = -0.175603595979829; a[3] = 0.675603595979829;
+       }
+       else if (mdp.integrator==BABABAB)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.351207191959658; a[1] = -1.702414383919316; a[2] = 1.351207191959658;
+       }
+       else if (mdp.integrator==ABADABA)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.089775972994422; a[1] = 0.410224027005578; a[2] = 0.410224027005578; a[3] = 0.089775972994422;
+       }
+       else if (mdp.integrator==DABABAD)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.258529167713908; a[1] = 0.482941664572184; a[2] = 0.258529167713908;
+       }
+       else if (mdp.integrator==BADADAB)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.281473422092232; a[1] = 0.437053155815536; a[2] = 0.281473422092232;
+       }
+       else if (mdp.integrator==ADABADA)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.136458051118946; a[1] = 0.363541948881054; a[2] = 0.363541948881054; a[3] = 0.136458051118946;
+       }
+       else if (mdp.integrator==ADADADA)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.116438749543126; a[1] = 0.383561250456874; a[2] = 0.383561250456874; a[3] = 0.116438749543126;
+       }
+       else if (mdp.integrator==DADADAD)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.273005515864808; a[1] = 0.453988968270384; a[2] = 0.273005515864808;
+       }
+       else if (mdp.integrator==ABABABABA)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.178617895844809; a[1] = -0.066264582669818; a[2] = 0.775293373650018; a[3] = -0.066264582669818; a[4] = 0.178617895844809;
+       }
+       else if (mdp.integrator==BABABABAB)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.520943339103990; a[1] = -0.020943339103990; a[2] = -0.020943339103990; a[3] = 0.520943339103990;
+       }
+       else if (mdp.integrator==BABADABAB)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.200395293638238; a[1] = 0.299604706361762; a[2] = 0.299604706361762; a[3] = 0.200395293638238;
+       }
+       else if (mdp.integrator==DABABABAD)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.190585159174513; a[1] = 0.309414840825487; a[2] = 0.309414840825487; a[3] = 0.190585159174513;
+       }
+       else if (mdp.integrator==BADABADAB)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.219039425103133; a[1] = 0.280960574896867; a[2] = 0.280960574896867; a[3] = 0.219039425103133;
+       }
+       else if (mdp.integrator==DABADABAD)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.197279141794602; a[1] = 0.302720858205398; a[2] = 0.302720858205398; a[3] = 0.197279141794602;
+       }
+       else if (mdp.integrator==ABADADABA)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.047802682977081; a[1] = 0.265994592108478; a[2] = 0.372405449828882; a[3] = 0.265994592108478; a[4] = 0.047802682977081;
+       }
+       else if (mdp.integrator==ADABABADA)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.118030603246046; a[1] = 0.295446189611111; a[2] = 0.173046414285686; a[3] = 0.295446189611111; a[4] = 0.118030603246046;
+       }
+       else if (mdp.integrator==DADABADAD)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.227758000273404; a[1] = 0.272241999726596; a[2] = 0.272241999726596; a[3] = 0.227758000273404;
+       }
+       else if (mdp.integrator==ADADADADA)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.094471605659163; a[1] = 0.281057227947299; a[2] = 0.248942332787076; a[3] = 0.281057227947299; a[4] = 0.094471605659163;
+       }
+       else if (mdp.integrator==BADADADAB)
+       {
+           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.079852426382431; a[1] = -0.579852426382431; a[2] = -0.579852426382431; a[3] = 1.079852426382431;
+       }
+       else if (mdp.integrator==BABABABABAB || mdp.integrator==OMF4)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.253978510841060; a[1] = -0.032302867652700; a[2] = 0.556648713623280; a[3] = -0.032302867652700; a[4] = 0.253978510841060;
+       }
+       else if (mdp.integrator==ABABABABABA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.275008121233242; a[1] = -0.134795009910679; a[2] = 0.359786888677437; a[3] = 0.359786888677437; a[4] = -0.134795009910679; a[5] = 0.275008121233242;
+       }
+       else if (mdp.integrator==ABABADABABA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.134257092137626; a[1] = -0.007010267216916; a[2] = 0.372753175079290; a[3] = 0.372753175079290; a[4] = -0.007010267216916; a[5] = 0.134257092137626;
+       }
+       else if (mdp.integrator==DABABABABAD)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.282918304065611; a[1] = -0.002348009438292; a[2] = 0.438859410745362; a[3] = -0.002348009438292; a[4] = 0.282918304065611;
+       }
+       else if (mdp.integrator==ABADABADABA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.062702644098210; a[1] = 0.193174566017780; a[2] = 0.244122789884010; a[3] = 0.244122789884010; a[4] = 0.193174566017780; a[5] = 0.062702644098210;
+       }
+       else if (mdp.integrator==BADABABADAB)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.201110227930330; a[1] = 0.200577842713366; a[2] = 0.196623858712608; a[3] = 0.200577842713366; a[4] = 0.201110227930330;
+       }
+       else if (mdp.integrator==ADABABABADA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.115889910143319; a[1] = 0.388722377182381; a[2] = -0.004612287325700; a[3] = -0.004612287325700; a[4] = 0.388722377182381; a[5] = 0.115889910143319;
+       }
+       else if (mdp.integrator==BABADADABAB)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.122268182901557; a[1] = 0.203023211433263; a[2] = 0.349417211330360; a[3] = 0.203023211433263; a[4] = 0.122268182901557;
+       }
+       else if (mdp.integrator==ADABADABADA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.083684971641549; a[1] = 0.225966488946428; a[2] = 0.190348539412023; a[3] = 0.190348539412023; a[4] = 0.225966488946428; a[5] = 0.083684971641549;
+       }
+       else if (mdp.integrator==DABADADABAD)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.068597474282941; a[1] = 0.284851197274498; a[2] = 0.293102656885122; a[3] = 0.284851197274498; a[4] = 0.068597474282941;
+       }
+       else if (mdp.integrator==DADABABADAD)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.203263079324187; a[1] = 0.200698071607808; a[2] = 0.192077698136010; a[3] = 0.200698071607808; a[4] = 0.203263079324187;
+       }
+       else if (mdp.integrator==ADADABADADA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.082541033171754; a[1] = 0.228637847036999; a[2] = 0.188821119791247; a[3] = 0.188821119791247; a[4] = 0.228637847036999; a[5] = 0.082541033171754;
+       }
+       else if (mdp.integrator==BADADADADAB)
+       {
+           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.270990466773838; a[1] = 0.635374358266882; a[2] = -0.812729650081440; a[3] = 0.635374358266882; a[4] = 0.270990466773838;
+       }
+       else if (mdp.integrator==ADADADADADA)
+       {
+           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.109534125980058; a[1] = 0.426279051773841; a[2] = -0.035813177753899; a[3] = -0.035813177753899; a[4] = 0.426279051773841; a[5] = 0.109534125980058;
+       }
+       else if (mdp.integrator==BABABABABABABAB)
+       {
+           d_a = 7; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.246588187278614; a[1] = 0.604707387505781; a[2] = -0.400986903978801; a[3] = 0.099382658388812; a[4] = -0.400986903978801; a[5] = 0.604707387505781; a[6] = 0.246588187278614;
+       }
+       else if (mdp.integrator==ABABABABABABABA)
+       {
+           d_a = 8; a = (double *)malloc(d_a * sizeof(double)); a[0] = -1.013087978917175; a[1] = 1.187429573732543; a[2] = -0.018335852096461; a[3] = 0.343994257281093; a[4] = 0.343994257281093; a[5] = -0.018335852096461; a[6] = 1.187429573732543; a[7] = -1.013087978917175;
+       }
+       else
+       {
+           a = (double *)malloc(sizeof(double)); a[0] = 1.0;
+       }	
+       return a;
+}
+
 
 static void print_ops(void)
 {
