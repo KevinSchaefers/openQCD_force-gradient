@@ -67,6 +67,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "mpi.h"
 #include "utils.h"
 #include "flags.h"
@@ -196,7 +197,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
    mdint_parms_t mdp;
 
    mdp=mdint_parms(ilv);
-   nstep=ceil( mdp.nstep * abs(weight) ); /* re-weighted multirate factor (except for macro level nlv-1) */
+   nstep=(int)(ceil( (double)(mdp.nstep) * abs(weight) )); /* re-weighted multirate factor (except for macro level nlv-1) */
    nfr=mdp.nfr;
    ifr=mdp.ifr;
 
@@ -356,7 +357,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu;
          (*s).eps=(1.0-2.0*(r2+r4))*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0-2.0*(r2+r4));     
+	 (*s).weight=1.0-2.0*(r2+r4);     
          s+=1;
           
          copy_steps(n,0.5-r1-r3,ws,s,0);
@@ -1402,10 +1403,11 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
     }
 }
 
-static void insert_level(int ilv, mdstep_t *s1, mdstep_t *s2, mdstep_t *s, mstep_t *r)
+static void insert_level(int ilv, mdstep_t *s1, mdstep_t *s2, mdstep_t *s, mdstep_t *r)
 {
 	int itu,nfrc,nall;
 	double eps;
+	double weight;
 
 	set_steps2zero(nsmx,r);
 	itu=iend-1;
@@ -1417,7 +1419,7 @@ static void insert_level(int ilv, mdstep_t *s1, mdstep_t *s2, mdstep_t *s, mstep
 	{
 		eps=(*s).eps;
 		weight=(*s).weight;
-		expand_level(ilv,1.0,weight,*s1,*s2);
+		expand_level(ilv,1.0,weight,s1,s2);
 		nfrc=nfrc_steps(s1);
 		nall=nall_steps(s1+nfrc);
 		add_frc_steps(eps,s1,r);
