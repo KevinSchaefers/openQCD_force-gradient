@@ -154,7 +154,7 @@ static void set_steps2zero(int n,mdstep_t *s)
       s[i].iop=iend;
       s[i].eps=0.0;
       s[i].lvl_id=-1;
-      s[i].weight=1.0;	   
+      s[i].weight=1.0;
    }
 }
 
@@ -166,8 +166,8 @@ static void copy_steps(int n,double c,mdstep_t *s,mdstep_t *r, int lvl)
    for (i=0;i<n;i++)
    {
       r[i].iop=s[i].iop;
-      r[i].eps=c*s[i].eps; 
-      r[i].weight=s[i].weight;	   
+      r[i].eps=c*s[i].eps;
+      r[i].weight=s[i].weight;
       if (lvl != 0)
       	r[i].lvl_id=s[i].lvl_id;
       else 
@@ -184,7 +184,7 @@ static void copy_steps_fg(int n,double c,mdstep_t *s,mdstep_t *r)
       r[i].iop=s[i].iop;
       r[i].eps=-c*s[i].eps*s[i].eps;
       r[i].lvl_id=s[i].lvl_id;
-      r[i].weight=s[i].weight;	   
+      r[i].weight=s[i].weight;
    }
 }
 
@@ -197,7 +197,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
    mdint_parms_t mdp;
 
    mdp=mdint_parms(ilv);
-   nstep=(int)(ceil( (double)(mdp.nstep) * abs(weight) )); /* re-weighted multirate factor (except for macro level nlv-1) */
+   nstep=(int)(ceil((double)(mdp.nstep) * fabs(weight)));	
    nfr=mdp.nfr;
    ifr=mdp.ifr;
 
@@ -232,7 +232,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          ws[n].iop=ifr[i];
          ws[n].eps=eps;
          ws[n].lvl_id=ilv;
-	 ws[n].weight=1.0;	
+	 ws[n].weight=1.0;
          n+=1;
       }
    }
@@ -247,12 +247,12 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu-3;
          (*s).eps=eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0;     
+	 (*s).weight=1.0;
          s+=1;
          (*s).iop=itu;
          (*s).eps=eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0;     
+	 (*s).weight=1.0;
          s+=1;
          if (i<nstep)
             copy_steps(n,1.0,ws,s,0);
@@ -263,7 +263,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
-      (*s).weight=1.0;		 
+      (*s).weight=1.0;
       s+=1;
    }
    else if (mdp.integrator==OMF2)
@@ -281,7 +281,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
           (*s).iop=itu;
           (*s).eps=0.5*eps;
           (*s).lvl_id=-1;
-	  (*s).weight=0.5;    
+	  (*s).weight=0.5;
           s+=1;
           
           copy_steps(n,1.0-2.0*r0,ws,s,0);
@@ -308,7 +308,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
-      (*s).weight=1.0;   
+      (*s).weight=1.0;
       s+=1;
    }
    else if (mdp.integrator==OMF4)
@@ -321,13 +321,13 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu-3;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0;     
+	 (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=r2;     
+	 (*s).weight=r2;
          s+=1;
           
          copy_steps(n,r3,ws,s,0);
@@ -336,13 +336,13 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu-3;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0;     
+	 (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=r4;     
+	 (*s).weight=r4;
          s+=1;
           
          copy_steps(n,0.5-r1-r3,ws,s,0);
@@ -357,7 +357,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu;
          (*s).eps=(1.0-2.0*(r2+r4))*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0-2.0*(r2+r4);     
+	 (*s).weight=1.0-2.0*(r2+r4);
          s+=1;
           
          copy_steps(n,0.5-r1-r3,ws,s,0);
@@ -366,13 +366,13 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu-3;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=1.0;     
+	 (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=r4;     
+	 (*s).weight=r4;
          s+=1;
           
          copy_steps(n,r3,ws,s,0);
@@ -381,13 +381,13 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
          (*s).iop=itu-3;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
-         (*s).weight=1.0;
+	 (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
-	 (*s).weight=r2;     
+	 (*s).weight=r2;
          s+=1;                  
           
          if (i<nstep)
@@ -399,7 +399,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
-      (*s).weight=1.0;	   
+      (*s).weight=1.0;
       s+=1;
    }
    else
@@ -800,7 +800,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                (*s).iop = itu-2;
                (*s).eps = 1.0;
                (*s).lvl_id=ilv;
-	       (*s).weight=1.0;   
+	       (*s).weight=1.0;
                s+=1;
                
                copy_steps(n,b[0],ws,s,1);
@@ -814,7 +814,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu-1;
                    (*s).eps = 0.0;
                    (*s).lvl_id = ilv;
-		   (*s).weight=1.0;    
+		   (*s).weight=1.0;
                    s+=1;
                }
                else 
@@ -822,14 +822,14 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu-3;
                    (*s).eps = b[0]*eps;
                    (*s).lvl_id = -1;
-		   (*s).weight=1.0;    
+		   (*s).weight=1.0;
                    s+=1;
                }
                
                (*s).iop = itu;
                (*s).eps = a[0]*eps;
                (*s).lvl_id=-1;
-	       (*s).weight=a[0];   
+	       (*s).weight=a[0];
                s+=1;
                
                for (j=1;j<d;j++)
@@ -847,7 +847,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;   
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,b[j],ws,s,1);
@@ -859,7 +859,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;	   
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    else 
@@ -867,7 +867,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-3;
                        (*s).eps = b[j]*eps;
                        (*s).lvl_id=-1;
-		       (*s).weight=1.0;	   
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    
@@ -892,7 +892,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;   
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,b[d_b-1],ws,s,1);
@@ -904,7 +904,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;   
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    else 
@@ -940,7 +940,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;	   
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,b[j],ws,s,1);
@@ -970,7 +970,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu;
                    (*s).eps = a[0]*eps;
                    (*s).lvl_id = -1;
-	           (*s).weight=a[0];
+		   (*s).weight=a[0];
                    s+=1;
                }
                
@@ -989,7 +989,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;	   
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,2*b[0],ws,s,1);
@@ -1025,7 +1025,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                (*s).iop = itu-1;
                (*s).eps = 0.0;
                (*s).lvl_id = ilv;
-	       (*s).weight=1.0;	   
+	       (*s).weight=1.0;
                s+=1;
            }
            else 
@@ -1134,7 +1134,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu;
                    (*s).eps = a[d_a-1]*eps;
                    (*s).lvl_id = -1;
-		   (*s).weight=a[d_a-1];    
+		   (*s).weight=a[d_a-1];
                    s+=1;
                }
                for (j=d-1;j>0;j--)
@@ -1166,7 +1166,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                            (*s).iop = itu-1;
                            (*s).eps = 0.0;
                            (*s).lvl_id = ilv;
-			   (*s).weight=1.0;    
+			   (*s).weight=1.0;
                            s+=1;
                        }
                        else 
@@ -1213,7 +1213,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
-		       (*s).weight=1.0;	
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    else 
@@ -1221,7 +1221,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                        (*s).iop = itu-3;
                        (*s).eps = b[0]*eps;
                        (*s).lvl_id = -1;
-		       (*s).weight=1.0;	
+		       (*s).weight=1.0;
                        s+=1;
                    }
                }
@@ -1231,7 +1231,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu;
                    (*s).eps = 2*a[0]*eps;
                    (*s).lvl_id = -1;
-		   (*s).weight=2*a[0];    
+		   (*s).weight=2.0*a[0];
                    s+=1;
                }
                else
@@ -1239,7 +1239,7 @@ static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *
                    (*s).iop = itu;
                    (*s).eps = a[0]*eps;
                    (*s).lvl_id = -1;
-		   (*s).weight=a[0];    
+		   (*s).weight=a[0];
                    s+=1;
                }
            }
@@ -1278,159 +1278,56 @@ static int nall_steps(mdstep_t *s)
    return n;
 }
 
-static void swap_steps(mdstep_t *s,mdstep_t *r)
-{
-   int is;
-   double rs;
-
-   is=(*s).iop;
-   (*s).iop=(*r).iop;
-   (*r).iop=is;
-
-   rs=(*s).eps;
-   (*s).eps=(*r).eps;
-   (*r).eps=rs;
-
-   is=(*s).lvl_id;
-   (*s).lvl_id=(*r).lvl_id;
-   (*r).lvl_id=is;
-
-   rs=(*s).weight;
-   (*s).weight=(*r).weight;
-   (*r).weight=rs;	
-}
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
 {
-    int n,m,i,j,mom_update_exists;
-    mom_update_exists=0;
-    n=nfrc_steps(s);
-    m=nfrc_steps(r);
+   int n,m,i;
 
-    /* the following nested loop adds s to r. If an operation in s is a force or momentum update with lvl_id=-1,
-       i.e. it does not belong to a force-gradient update, then we may just add the step size to the same operation
-       in r (if it exists). Otherwise, the operation is added to the end of r.*/
-    for (i=0;i<n;i++)
-    {
-       for (j=0;j<m;j++)
-       {
-          if (r[j].iop==s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id == -1)
-          {
-             r[j].eps+=c*s[i].eps;
-             break;
-          }
-          else if (r[j].iop < iend-4 && s[i].iop < iend-4 && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == c*s[i].eps)
-          {
-              /* there are two force-gradient updates that we can merge since the temporary updates of the link field use the same step size */
-              /* first, we skip all force updates for the temporary link update */
-              while (s[i].iop != iend-3)
-              {
-                  i+=1;
-              }
-              while (r[j].iop != iend-3)
-              {
-                  j+=1;
-              }
-              /* second, we also skip the operation creating a copy of the link field */
-              i+=1; j+=1;
-              /* now, we can sum up the step sizes of the forces*/
-              while (s[i].iop != iend-2)
-              {
-                  r[j].eps+=c*s[i].eps;
-                  i+=1; j+=1;
-              }
-              /* we are now done with merging the two force-gradient updates. The current operation s[i] is performing the momentum update 
-	       * + restoring the link field. This is already in r so that we can skip this operation. */
-              break;
-          }
-       }
+   n=nfrc_steps(s);
+   m=nfrc_steps(r);
 
-       if (j==m)
-       {
-          r[j].iop=s[i].iop;
-          r[j].eps=c*s[i].eps;
-          r[j].lvl_id = s[i].lvl_id;
-	  r[j].weight = s[i].weight;     
-          m+=1;
-       }
-    }
-
-    /* the next for loop searches for the momentum update operation (itu-3) and makes it the first operation in r */	
-    for (j=m-1;j>=0;j--)
-    {
-        if (r[j].iop == iend-4)
-        {
-                i=1;
-                while(j-i >= 0)
-                {
-                        swap_steps(r+j-i+1,r+j-i);
-                        i+=1;
-                }
-                mom_update_exists=1; /* there are not only force-gradient updates, i.e. we have to sort */
-                break;
-        }
-    }
-	
-    if (mom_update_exists == 1)
-    {
-	    /* sort the operations so that 
-     	  	1) force-updates that do not belong to force-gradient updates
-	 	2) momentum update (itu-3) 
-   		3) force-gradient updates */
-	    for (j=m-1;j>0;j--)
-	    {
-	        if (r[j].iop == iend-4)
-		   /* all force updates that do not belong to a force-gradient update are in front of the momentum
-      			update. We can stop sorting. */
-	            break;
-	        else if (r[j].iop < iend-4 && r[j].lvl_id == -1)
-	        {
-		    /* we found a force update that has to appear in front of the momentum update. Thus we swap the 
-      			present operation with its predecessor until it has been swapped with the momentum update */
-	            i = 1;
-	            while (j-i >= 0)
-	            {
-	                swap_steps(r+j-i+1,r+j-i);
-	                if (r[j-i+1].iop == iend-4)
-	                {
-	                        j+=1;
-	                        break;
-	                }
-	                i+=1;
-	            }
-	        }
-	    }
-    }
+   for (i=0;i<n;i++)
+   {
+	 r[m].iop=s[i].iop;
+	 r[m].eps=c*s[i].eps;
+	 r[m].lvl_id=s[i].lvl_id;
+	 r[m].weight=s[i].weight;
+	 m+=1;
+   }
 }
 
-static void insert_level(int ilv, mdstep_t *s1, mdstep_t *s2, mdstep_t *s, mdstep_t *r)
+
+static void insert_level(int ilv,mdstep_t *s1,mdstep_t *s2,mdstep_t *s,mdstep_t *r)
 {
-	int itu,nfrc,nall;
-	double eps;
-	double weight;
+   int itu,nfrc,nall;
+   double eps;
+   double weight;
 
-	set_steps2zero(nsmx,r);
-	itu=iend-1;
+   set_steps2zero(nsmx,r);
 
-	add_frc_steps(1.0,s,r);
-	s+=nfrc_steps(s);
+   itu=iend-1;
 
-	while((*s).iop==itu)
-	{
-		eps=(*s).eps;
-		weight=(*s).weight;
-		expand_level(ilv,1.0,weight,s1,s2);
-		nfrc=nfrc_steps(s1);
-		nall=nall_steps(s1+nfrc);
-		add_frc_steps(eps,s1,r);
-		r+=nfrc_steps(r);
-		copy_steps(nall,eps,s1+nfrc,r,1);
-		r+=nall-nfrc;
+   add_frc_steps(1.0,s,r);
+   s+=nfrc_steps(s);
 
-		s+=1;
-        	add_frc_steps(1.0,s,r);
-        	s+=nfrc_steps(s);		
-	}
+   while ((*s).iop==itu)
+   {
+      eps=(*s).eps;
+      weight=(*s).weight;
+
+      expand_level(ilv,1.0,weight,mdw[1],mdw[2]);
+      nfrc=nfrc_steps(s1);
+      nall=nall_steps(s1+nfrc);
+
+      add_frc_steps(eps,s1,r);
+      r+=nfrc_steps(r);
+      copy_steps(nall,eps,s1+nfrc,r,1);
+      r+=nall-nfrc;
+
+      s+=1;
+      add_frc_steps(1.0,s,r);
+      s+=nfrc_steps(s);
+   }
 }
 
 static void set_nlv(int *nlv,double *tau)
@@ -1464,13 +1361,12 @@ void set_mdsteps(void)
    set_nlv(&nlv,&tau);
    set_nsmx(nlv);
    alloc_mds();
-   expand_level(nlv-1,tau,1.0,mds,mdw[0]); /* third argument 1.0 added as weight (no re-weighting) */
+   expand_level(nlv-1,tau,1.0,mds,mdw[0]);
 
    for (ilv=(nlv-2);ilv>=0;ilv--)
    {
       n=nall_steps(mds);
       copy_steps(n,1.0,mds,mdw[0],1);
-      /*expand_level(ilv,1.0,mdw[1],mdw[2]);*/
       insert_level(ilv,mdw[1],mdw[2],mdw[0],mds);
    }
 
@@ -1485,6 +1381,7 @@ mdstep_t *mdsteps(int *nop,int *itu)
 
    return mds;
 }
+
 
 static void print_ops(void)
 {
