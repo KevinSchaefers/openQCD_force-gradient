@@ -153,6 +153,7 @@ static void set_steps2zero(int n,mdstep_t *s)
       s[i].iop=iend;
       s[i].eps=0.0;
       s[i].lvl_id=-1;
+      s[i].weight=1.0;	   
    }
 }
 
@@ -164,7 +165,8 @@ static void copy_steps(int n,double c,mdstep_t *s,mdstep_t *r, int lvl)
    for (i=0;i<n;i++)
    {
       r[i].iop=s[i].iop;
-      r[i].eps=c*s[i].eps;
+      r[i].eps=c*s[i].eps; 
+      r[i].weight=s[i].weight;	   
       if (lvl != 0)
       	r[i].lvl_id=s[i].lvl_id;
       else 
@@ -181,11 +183,12 @@ static void copy_steps_fg(int n,double c,mdstep_t *s,mdstep_t *r)
       r[i].iop=s[i].iop;
       r[i].eps=-c*s[i].eps*s[i].eps;
       r[i].lvl_id=s[i].lvl_id;
+      r[i].weight=s[i].weight;	   
    }
 }
 
 
-static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
+static void expand_level(int ilv,double tau,double weight,mdstep_t *s,mdstep_t *ws)
 {
    int nstep,nfr,*ifr;
    int itu,n,i,j;
@@ -193,7 +196,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
    mdint_parms_t mdp;
 
    mdp=mdint_parms(ilv);
-   nstep=mdp.nstep;
+   nstep=ceil( mdp.nstep * abs(weight) ); /* re-weighted multirate factor (except for macro level nlv-1) */
    nfr=mdp.nfr;
    ifr=mdp.ifr;
 
@@ -228,6 +231,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          ws[n].iop=ifr[i];
          ws[n].eps=eps;
          ws[n].lvl_id=ilv;
+	 ws[n].weight=1.0;	
          n+=1;
       }
    }
@@ -242,10 +246,12 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;     
          s+=1;
          (*s).iop=itu;
          (*s).eps=eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;     
          s+=1;
          if (i<nstep)
             copy_steps(n,1.0,ws,s,0);
@@ -256,6 +262,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
+      (*s).weight=1.0;		 
       s+=1;
    }
    else if (mdp.integrator==OMF2)
@@ -268,10 +275,12 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
           (*s).iop=itu-3;
           (*s).eps=0.5*eps;
           (*s).lvl_id=-1;
+	  (*s).weight=1.0;
           s+=1;
           (*s).iop=itu;
           (*s).eps=0.5*eps;
           (*s).lvl_id=-1;
+	  (*s).weight=0.5;    
           s+=1;
           
           copy_steps(n,1.0-2.0*r0,ws,s,0);
@@ -280,11 +289,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
           (*s).iop=itu-3;
           (*s).eps=0.5*eps;
           (*s).lvl_id=-1;
+	  (*s).weight=1.0;
           s+=1;
 
           (*s).iop=itu;
           (*s).eps=0.5*eps;
           (*s).lvl_id=-1;
+	  (*s).weight=0.5;
           s+=1;
           
           if (i<nstep)
@@ -296,6 +307,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
+      (*s).weight=1.0;   
       s+=1;
    }
    else if (mdp.integrator==OMF4)
@@ -308,11 +320,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;     
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=r2;     
          s+=1;
           
          copy_steps(n,r3,ws,s,0);
@@ -321,11 +335,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;     
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=r4;     
          s+=1;
           
          copy_steps(n,0.5-r1-r3,ws,s,0);
@@ -334,11 +350,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=(1.0-2.0*(r2+r4))*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=(1.0-2.0*(r2+r4))*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0-2.0*(r2+r4));     
          s+=1;
           
          copy_steps(n,0.5-r1-r3,ws,s,0);
@@ -347,11 +365,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=1.0;     
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r4*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=r4;     
          s+=1;
           
          copy_steps(n,r3,ws,s,0);
@@ -360,11 +380,13 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
          (*s).iop=itu-3;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
+         (*s).weight=1.0;
          s+=1;
           
          (*s).iop=itu;
          (*s).eps=r2*eps;
          (*s).lvl_id=-1;
+	 (*s).weight=r2;     
          s+=1;                  
           
          if (i<nstep)
@@ -376,6 +398,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
       (*s).iop=itu-3;
       (*s).eps=0.5*eps;
       (*s).lvl_id=-1;
+      (*s).weight=1.0;	   
       s+=1;
    }
    else
@@ -776,6 +799,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                (*s).iop = itu-2;
                (*s).eps = 1.0;
                (*s).lvl_id=ilv;
+	       (*s).weight=1.0;   
                s+=1;
                
                copy_steps(n,b[0],ws,s,1);
@@ -789,6 +813,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu-1;
                    (*s).eps = 0.0;
                    (*s).lvl_id = ilv;
+		   (*s).weight=1.0;    
                    s+=1;
                }
                else 
@@ -796,12 +821,14 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu-3;
                    (*s).eps = b[0]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=1.0;    
                    s+=1;
                }
                
                (*s).iop = itu;
                (*s).eps = a[0]*eps;
                (*s).lvl_id=-1;
+	       (*s).weight=a[0];   
                s+=1;
                
                for (j=1;j<d;j++)
@@ -819,6 +846,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;   
                        s+=1;
                        
                        copy_steps(n,b[j],ws,s,1);
@@ -830,6 +858,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;	   
                        s+=1;
                    }
                    else 
@@ -837,12 +866,14 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-3;
                        (*s).eps = b[j]*eps;
                        (*s).lvl_id=-1;
+		       (*s).weight=1.0;	   
                        s+=1;
                    }
                    
                    (*s).iop = itu;
                    (*s).eps = a[j]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=a[j];
                    s+=1;
                }
                if (d_a < d_b)
@@ -860,6 +891,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;   
                        s+=1;
                        
                        copy_steps(n,b[d_b-1],ws,s,1);
@@ -871,6 +903,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;   
                        s+=1;
                    }
                    else 
@@ -878,6 +911,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-3;
                        (*s).eps = b[d_b-1]*eps;
                        (*s).lvl_id = -1;
+		       (*s).weight=1.0;
                        s+=1;
                    }
                }
@@ -888,6 +922,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu;
                        (*s).eps = a[j]*eps;
                        (*s).lvl_id = -1;
+		       (*s).weight=a[j];
                        s+=1;
                    }
                    
@@ -904,6 +939,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;	   
                        s+=1;
                        
                        copy_steps(n,b[j],ws,s,1);
@@ -915,6 +951,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    else 
@@ -922,6 +959,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-3;
                        (*s).eps = b[j]*eps;
                        (*s).lvl_id = -1;
+		       (*s).weight=1.0;
                        s+=1;
                    }
                }
@@ -931,6 +969,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = a[0]*eps;
                    (*s).lvl_id = -1;
+	           (*s).weight=a[0];
                    s+=1;
                }
                
@@ -949,6 +988,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;	   
                        s+=1;
                        
                        copy_steps(n,2*b[0],ws,s,1);
@@ -970,6 +1010,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
 		       (*s).lvl_id = ilv;
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,b[0],ws,s,1);
@@ -983,6 +1024,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                (*s).iop = itu-1;
                (*s).eps = 0.0;
                (*s).lvl_id = ilv;
+	       (*s).weight=1.0;	   
                s+=1;
            }
            else 
@@ -990,6 +1032,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                (*s).iop = itu-3;
                (*s).eps = b[0]*eps;
                (*s).lvl_id = -1;
+	       (*s).weight=1.0;
                s+=1;
            }
        }
@@ -998,6 +1041,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
            (*s).iop = itu;
            (*s).eps = a[0]*eps;
            (*s).lvl_id = -1;
+	   (*s).weight=a[0];
            s+=1;
            
            for (i=1;i<=nstep;i++)
@@ -1015,6 +1059,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu-2;
                    (*s).eps = 1.0;
                    (*s).lvl_id = ilv;
+		   (*s).weight=1.0;
                    s+=1;
                    
                    copy_steps(n,b[0],ws,s,1);
@@ -1026,6 +1071,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu-1;
                    (*s).eps = 0.0;
                    (*s).lvl_id = ilv;
+		   (*s).weight=1.0;
                    s+=1;
                }
                else 
@@ -1033,6 +1079,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu-3;
                    (*s).eps = b[0]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=1.0;
                    s+=1;
                }
                
@@ -1041,6 +1088,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = a[j]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=a[j];
                    s+=1;
                    
                    if (c[j] == 0)
@@ -1056,6 +1104,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;
                        s+=1;
                        
                        copy_steps(n,b[j],ws,s,1);
@@ -1067,6 +1116,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;
                        s+=1;
                    }
                    else 
@@ -1074,6 +1124,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-3;
                        (*s).eps = b[j]*eps;
                        (*s).lvl_id = -1;
+		       (*s).weight=1.0;
                        s+=1;
                    }
                }
@@ -1082,6 +1133,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = a[d_a-1]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=a[d_a-1];    
                    s+=1;
                }
                for (j=d-1;j>0;j--)
@@ -1101,6 +1153,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                            (*s).iop = itu-2;
                            (*s).eps = 1.0;
                            (*s).lvl_id = ilv;
+			   (*s).weight=1.0;
                            s+=1;
                            
                            copy_steps(n,b[j],ws,s,1);
@@ -1112,6 +1165,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                            (*s).iop = itu-1;
                            (*s).eps = 0.0;
                            (*s).lvl_id = ilv;
+			   (*s).weight=1.0;    
                            s+=1;
                        }
                        else 
@@ -1119,6 +1173,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                            (*s).iop = itu-3;
                            (*s).eps = b[j]*eps;
                            (*s).lvl_id = -1;
+			   (*s).weight=1.0;
                            s+=1;
                        }
                    }
@@ -1126,6 +1181,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = a[j]*eps;
                    (*s).lvl_id = -1; 
+		   (*s).weight=a[j];
                    s+=1;
                }
 
@@ -1144,6 +1200,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-2;
                        (*s).eps = 1.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;
                        s+=1;
                    
                        copy_steps(n,b[0],ws,s,1);
@@ -1155,6 +1212,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-1;
                        (*s).eps = 0.0;
                        (*s).lvl_id = ilv;
+		       (*s).weight=1.0;	
                        s+=1;
                    }
                    else 
@@ -1162,6 +1220,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                        (*s).iop = itu-3;
                        (*s).eps = b[0]*eps;
                        (*s).lvl_id = -1;
+		       (*s).weight=1.0;	
                        s+=1;
                    }
                }
@@ -1171,6 +1230,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = 2*a[0]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=2*a[0];    
                    s+=1;
                }
                else
@@ -1178,6 +1238,7 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
                    (*s).iop = itu;
                    (*s).eps = a[0]*eps;
                    (*s).lvl_id = -1;
+		   (*s).weight=a[0];    
                    s+=1;
                }
            }
@@ -1232,6 +1293,10 @@ static void swap_steps(mdstep_t *s,mdstep_t *r)
    is=(*s).lvl_id;
    (*s).lvl_id=(*r).lvl_id;
    (*r).lvl_id=is;
+
+   rs=(*s).weight;
+   (*s).weight=(*r).weight;
+   (*r).weight=rs;	
 }
 
 static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
@@ -1284,6 +1349,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
           r[j].iop=s[i].iop;
           r[j].eps=c*s[i].eps;
           r[j].lvl_id = s[i].lvl_id;
+	  r[j].weight = s[i].weight;     
           m+=1;
        }
     }
@@ -1336,33 +1402,33 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
     }
 }
 
-
-static void insert_level(mdstep_t *s1,mdstep_t *s2,mdstep_t *r)
+static void insert_level(int ilv, mdstep_t *s1, mdstep_t *s2, mdstep_t *s, mstep_t *r)
 {
-   int itu,nfrc,nall;
-   double eps;
+	int itu,nfrc,nall;
+	double eps;
 
-   set_steps2zero(nsmx,r);
+	set_steps2zero(nsmx,r);
+	itu=iend-1;
 
-   itu=iend-1;
-   nfrc=nfrc_steps(s1);
-   nall=nall_steps(s1+nfrc);
+	add_frc_steps(1.0,s,r);
+	s+=nfrc_steps(s);
 
-   add_frc_steps(1.0,s2,r);
-   s2+=nfrc_steps(s2);
+	while((*s).iop==itu)
+	{
+		eps=(*s).eps;
+		weight=(*s).weight;
+		expand_level(ilv,1.0,weight,*s1,*s2);
+		nfrc=nfrc_steps(s1);
+		nall=nall_steps(s1+nfrc);
+		add_frc_steps(eps,s1,r);
+		r+=nfrc_steps(r);
+		copy_steps(nall,eps,s1+nfrc,r,1);
+		r+=nall-nfrc;
 
-   while ((*s2).iop==itu)
-   {
-      eps=(*s2).eps;
-      add_frc_steps(eps,s1,r);
-      r+=nfrc_steps(r);
-      copy_steps(nall,eps,s1+nfrc,r,1);
-      r+=nall-nfrc;
-
-      s2+=1;
-      add_frc_steps(1.0,s2,r);
-      s2+=nfrc_steps(s2);
-   }
+		s+=1;
+        	add_frc_steps(1.0,s,r);
+        	s+=nfrc_steps(s);		
+	}
 }
 
 static void set_nlv(int *nlv,double *tau)
@@ -1396,14 +1462,14 @@ void set_mdsteps(void)
    set_nlv(&nlv,&tau);
    set_nsmx(nlv);
    alloc_mds();
-   expand_level(nlv-1,tau,mds,mdw[0]);
+   expand_level(nlv-1,tau,1.0,mds,mdw[0]); /* third argument 1.0 added as weight (no re-weighting) */
 
    for (ilv=(nlv-2);ilv>=0;ilv--)
    {
       n=nall_steps(mds);
       copy_steps(n,1.0,mds,mdw[0],1);
-      expand_level(ilv,1.0,mdw[1],mdw[2]);
-      insert_level(mdw[1],mdw[0],mds);
+      /*expand_level(ilv,1.0,mdw[1],mdw[2]);*/
+      insert_level(ilv,mdw[1],mdw[2],mdw[0],mds);
    }
 
    nmds=nall_steps(mds)+1;
@@ -1417,201 +1483,6 @@ mdstep_t *mdsteps(int *nop,int *itu)
 
    return mds;
 }
-
-double* get_linkupdate_weights(int ilv)
-{
-       mdp=mdint_parms(ilv);
-       int d_a;
-       double *a;
-       d_a = 0;
-       
-       if (mdp.integrator==BAB || mdp.integrator==LPFR)
-       {
-           d_a = 1; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.0;
-       }
-       else if (mdp.integrator==ABA)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==DAD)
-       {
-           d_a = 1; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.0;
-       }
-       else if (mdp.integrator==ADA)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==BABAB || mdp.integrator==OMF2)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==ABABA)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.1931833275037836; a[1] = 0.613633344992433; a[2] = 0.1931833275037836;
-       }
-       else if (mdp.integrator==BADAB)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==DABAD)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==DADAD)
-       {
-           d_a = 2; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.5; a[1] = 0.5;
-       }
-       else if (mdp.integrator==ADADA)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.211324865405187; a[1] = 0.577350269189626; a[2] = 0.211324865405187;
-       }
-       else if (mdp.integrator==ABABABA)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.675603595979829; a[1] = -0.175603595979829; a[2] = -0.175603595979829; a[3] = 0.675603595979829;
-       }
-       else if (mdp.integrator==BABABAB)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.351207191959658; a[1] = -1.702414383919316; a[2] = 1.351207191959658;
-       }
-       else if (mdp.integrator==ABADABA)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.089775972994422; a[1] = 0.410224027005578; a[2] = 0.410224027005578; a[3] = 0.089775972994422;
-       }
-       else if (mdp.integrator==DABABAD)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.258529167713908; a[1] = 0.482941664572184; a[2] = 0.258529167713908;
-       }
-       else if (mdp.integrator==BADADAB)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.281473422092232; a[1] = 0.437053155815536; a[2] = 0.281473422092232;
-       }
-       else if (mdp.integrator==ADABADA)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.136458051118946; a[1] = 0.363541948881054; a[2] = 0.363541948881054; a[3] = 0.136458051118946;
-       }
-       else if (mdp.integrator==ADADADA)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.116438749543126; a[1] = 0.383561250456874; a[2] = 0.383561250456874; a[3] = 0.116438749543126;
-       }
-       else if (mdp.integrator==DADADAD)
-       {
-           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.273005515864808; a[1] = 0.453988968270384; a[2] = 0.273005515864808;
-       }
-       else if (mdp.integrator==ABABABABA)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.178617895844809; a[1] = -0.066264582669818; a[2] = 0.775293373650018; a[3] = -0.066264582669818; a[4] = 0.178617895844809;
-       }
-       else if (mdp.integrator==BABABABAB)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.520943339103990; a[1] = -0.020943339103990; a[2] = -0.020943339103990; a[3] = 0.520943339103990;
-       }
-       else if (mdp.integrator==BABADABAB)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.200395293638238; a[1] = 0.299604706361762; a[2] = 0.299604706361762; a[3] = 0.200395293638238;
-       }
-       else if (mdp.integrator==DABABABAD)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.190585159174513; a[1] = 0.309414840825487; a[2] = 0.309414840825487; a[3] = 0.190585159174513;
-       }
-       else if (mdp.integrator==BADABADAB)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.219039425103133; a[1] = 0.280960574896867; a[2] = 0.280960574896867; a[3] = 0.219039425103133;
-       }
-       else if (mdp.integrator==DABADABAD)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.197279141794602; a[1] = 0.302720858205398; a[2] = 0.302720858205398; a[3] = 0.197279141794602;
-       }
-       else if (mdp.integrator==ABADADABA)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.047802682977081; a[1] = 0.265994592108478; a[2] = 0.372405449828882; a[3] = 0.265994592108478; a[4] = 0.047802682977081;
-       }
-       else if (mdp.integrator==ADABABADA)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.118030603246046; a[1] = 0.295446189611111; a[2] = 0.173046414285686; a[3] = 0.295446189611111; a[4] = 0.118030603246046;
-       }
-       else if (mdp.integrator==DADABADAD)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.227758000273404; a[1] = 0.272241999726596; a[2] = 0.272241999726596; a[3] = 0.227758000273404;
-       }
-       else if (mdp.integrator==ADADADADA)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.094471605659163; a[1] = 0.281057227947299; a[2] = 0.248942332787076; a[3] = 0.281057227947299; a[4] = 0.094471605659163;
-       }
-       else if (mdp.integrator==BADADADAB)
-       {
-           d_a = 4; a = (double *)malloc(d_a * sizeof(double)); a[0] = 1.079852426382431; a[1] = -0.579852426382431; a[2] = -0.579852426382431; a[3] = 1.079852426382431;
-       }
-       else if (mdp.integrator==BABABABABAB || mdp.integrator==OMF4)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.253978510841060; a[1] = -0.032302867652700; a[2] = 0.556648713623280; a[3] = -0.032302867652700; a[4] = 0.253978510841060;
-       }
-       else if (mdp.integrator==ABABABABABA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.275008121233242; a[1] = -0.134795009910679; a[2] = 0.359786888677437; a[3] = 0.359786888677437; a[4] = -0.134795009910679; a[5] = 0.275008121233242;
-       }
-       else if (mdp.integrator==ABABADABABA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.134257092137626; a[1] = -0.007010267216916; a[2] = 0.372753175079290; a[3] = 0.372753175079290; a[4] = -0.007010267216916; a[5] = 0.134257092137626;
-       }
-       else if (mdp.integrator==DABABABABAD)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.282918304065611; a[1] = -0.002348009438292; a[2] = 0.438859410745362; a[3] = -0.002348009438292; a[4] = 0.282918304065611;
-       }
-       else if (mdp.integrator==ABADABADABA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.062702644098210; a[1] = 0.193174566017780; a[2] = 0.244122789884010; a[3] = 0.244122789884010; a[4] = 0.193174566017780; a[5] = 0.062702644098210;
-       }
-       else if (mdp.integrator==BADABABADAB)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.201110227930330; a[1] = 0.200577842713366; a[2] = 0.196623858712608; a[3] = 0.200577842713366; a[4] = 0.201110227930330;
-       }
-       else if (mdp.integrator==ADABABABADA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.115889910143319; a[1] = 0.388722377182381; a[2] = -0.004612287325700; a[3] = -0.004612287325700; a[4] = 0.388722377182381; a[5] = 0.115889910143319;
-       }
-       else if (mdp.integrator==BABADADABAB)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.122268182901557; a[1] = 0.203023211433263; a[2] = 0.349417211330360; a[3] = 0.203023211433263; a[4] = 0.122268182901557;
-       }
-       else if (mdp.integrator==ADABADABADA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.083684971641549; a[1] = 0.225966488946428; a[2] = 0.190348539412023; a[3] = 0.190348539412023; a[4] = 0.225966488946428; a[5] = 0.083684971641549;
-       }
-       else if (mdp.integrator==DABADADABAD)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.068597474282941; a[1] = 0.284851197274498; a[2] = 0.293102656885122; a[3] = 0.284851197274498; a[4] = 0.068597474282941;
-       }
-       else if (mdp.integrator==DADABABADAD)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.203263079324187; a[1] = 0.200698071607808; a[2] = 0.192077698136010; a[3] = 0.200698071607808; a[4] = 0.203263079324187;
-       }
-       else if (mdp.integrator==ADADABADADA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.082541033171754; a[1] = 0.228637847036999; a[2] = 0.188821119791247; a[3] = 0.188821119791247; a[4] = 0.228637847036999; a[5] = 0.082541033171754;
-       }
-       else if (mdp.integrator==BADADADADAB)
-       {
-           d_a = 5; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.270990466773838; a[1] = 0.635374358266882; a[2] = -0.812729650081440; a[3] = 0.635374358266882; a[4] = 0.270990466773838;
-       }
-       else if (mdp.integrator==ADADADADADA)
-       {
-           d_a = 6; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.109534125980058; a[1] = 0.426279051773841; a[2] = -0.035813177753899; a[3] = -0.035813177753899; a[4] = 0.426279051773841; a[5] = 0.109534125980058;
-       }
-       else if (mdp.integrator==BABABABABABABAB)
-       {
-           d_a = 7; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.246588187278614; a[1] = 0.604707387505781; a[2] = -0.400986903978801; a[3] = 0.099382658388812; a[4] = -0.400986903978801; a[5] = 0.604707387505781; a[6] = 0.246588187278614;
-       }
-       else if (mdp.integrator==ABABABABABABABA)
-       {
-           d_a = 8; a = (double *)malloc(d_a * sizeof(double)); a[0] = -1.013087978917175; a[1] = 1.187429573732543; a[2] = -0.018335852096461; a[3] = 0.343994257281093; a[4] = 0.343994257281093; a[5] = -0.018335852096461; a[6] = 1.187429573732543; a[7] = -1.013087978917175;
-       }
-       else
-       {
-           a = (double *)malloc(sizeof(double)); a[0] = 1.0;
-       }	
-       return a;
-}
-
 
 static void print_ops(void)
 {
