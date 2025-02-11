@@ -23,6 +23,7 @@ typedef struct
    int iop;
    double eps;
    int lvl_id;
+   double weight;
 } mdstep_t;
 
 /* CHRONO_C */
