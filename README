@@ -61,11 +61,14 @@ to the two-dimensional Schwinger model, see <https://doi.org/10.4208/cicp.OA-201
 
 Due to the re-weighting of the multirate factors, you may have to increase the nsteps parameter on the 
 finer levels to achieve the same accuracy. You can determine the necessary change as follows:
-Consider an integrator of level i+1 that has integrator coefficients a_j. Then, for level i, you have
+Consider an integrator of level l+1 that has integrator coefficients a_j. Then, for level l, you have
 to update nsteps so that 
 ceil( nsteps_new * max_j abs(a_j) ) >= nsteps_old
 is satisfied. Then, the integrator should achieve approximately the same acceptance probability as for 
 openQCD v2.4 while demanding less force evaluations per trajectory. 
+Remark: If the integrator on level l+1 is a position version (starting with a link update), then one must
+also consider abs(2 * a_1) for determining the updated nsteps as the last link update (A) of a time step 
+is linked to the first link update (A) of the proceeding time step, resulting in step size 2*a_1*eps.
 Note: for nsteps = 1, the re-weighting does not apply so that the integrator remains unchanged.
 
 
