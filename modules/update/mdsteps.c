@@ -104,7 +104,7 @@ static void set_nsmx(int nlv)
           ntu*=6*mdp.nstep;
       else if (mdp.integrator==DADABADAD || mdp.integrator==BADADADAB || mdp.integrator==ABADABADABA || mdp.integrator==BADABABADAB || mdp.integrator==ADABABABADA || mdp.integrator==BABADADABAB || mdp.integrator==BABABABABABABAB || mdp.integrator==ABABABABABABABA)
           ntu*=7*mdp.nstep;
-      else if (mdp.integrator==ADADADADA || mdp.integrator==ADABADABADA || mdp.integrator==DABADADABAD || mdp.integrator==DADABABADAD)
+      else if (mdp.integrator==ADADADADA || mdp.integrator==ADABADABADA || mdp.integrator==DABADADABAD || mdp.integrator==DADABABADAD || mdp.integrator==POISSON1 || mdp.integrator==POISSON2 || mdp.integrator==POISSON3 || mdp.integrator==POISSON4 || mdp.integrator==POISSON5)
           ntu*=8*mdp.nstep;
       else if (mdp.integrator==ADADABADADA || mdp.integrator==BADADADADAB)
           ntu*=9*mdp.nstep;
@@ -704,6 +704,46 @@ static void expand_level(int ilv,double tau,mdstep_t *s,mdstep_t *ws)
            d = 3;
            velocity = 1;
        }
+       else if (mdp.integrator==POISSON1)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.061279782861097; a[1] = 0.289626978654388; a[2] = 0.298186476969030;
+           d_b = 3; b = (double *)malloc(d_b * sizeof(double)); b[0] = -0.047292085897878; b[1] = 0.242730466868211; b[2] = 0.304561619029667;
+           c = (double *)malloc(d_b * sizeof(double)); c[0] = 0.000502235923217; c[1] = 0.0; c[2] = 0.001274533116898;
+           d = 3;
+           velocity = 1;
+       }
+       else if (mdp.integrator==POISSON2)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.630410133220572; a[1] = 0.431378259931518; a[2] = -1.123576786304180;
+           d_b = 3; b = (double *)malloc(d_b * sizeof(double)); b[0] = 0.322204236235363; b[1] = 0.318144774774717; b[2] = -0.140349011010080;
+           c = (double *)malloc(d_b * sizeof(double)); c[0] = -0.003988373114016; c[1] = 0.0; c[2] = -0.002632296675452;
+           d = 3;
+           velocity = 1;
+       }
+       else if (mdp.integrator==POISSON3)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.066319967920581; a[1] = 0.292569035032473; a[2] = 0.282221994093892;
+           d_b = 3; b = (double *)malloc(d_b * sizeof(double)); b[0] = -0.038164197022441; b[1] = 0.240783559471465; b[2] = 0.297380637550976;
+           c = (double *)malloc(d_b * sizeof(double)); c[0] = 0.000450275231380; c[1] = 0.0; c[2] = 0.001256916239929;
+           d = 3;
+           velocity = 1;
+       }
+       else if (mdp.integrator==POISSON4)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.619017626189581; a[1] = 0.449453599780201; a[2] = -1.136942451939564;
+           d_b = 3; b = (double *)malloc(d_b * sizeof(double)); b[0] = 0.319724546825268; b[1] = 0.312375306936669; b[2] = -0.132099853761937;
+           c = (double *)malloc(d_b * sizeof(double)); c[0] = -0.004171563596131; c[1] = 0.0; c[2] = -0.002681402728948;
+           d = 3;
+           velocity = 1;
+       }
+       else if (mdp.integrator==POISSON5)
+       {
+           d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.622941926396597; a[1] = 0.443249676749669; a[2] = -1.132383206292532;
+           d_b = 3; b = (double *)malloc(d_b * sizeof(double)); b[0] = 0.320591619433595; b[1] = 0.314264616945816; b[2] = -0.134856236379411;
+           c = (double *)malloc(d_b * sizeof(double)); c[0] = -0.003864139444883; c[1] = 0.0; c[2] = -0.002913249049864;
+           d = 3;
+           velocity = 1;
+       }	       
        else if (mdp.integrator==DADABABADAD)
        {
            d_a = 3; a = (double *)malloc(d_a * sizeof(double)); a[0] = 0.203263079324187; a[1] = 0.200698071607808; a[2] = 0.192077698136010;
