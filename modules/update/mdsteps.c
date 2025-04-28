@@ -104,7 +104,7 @@ static void set_nsmx(int nlv)
           ntu*=6*mdp.nstep;
       else if (mdp.integrator==DADABADAD || mdp.integrator==BADADADAB || mdp.integrator==ABADABADABA || mdp.integrator==BADABABADAB || mdp.integrator==ADABABABADA || mdp.integrator==BABADADABAB || mdp.integrator==BABABABABABABAB || mdp.integrator==ABABABABABABABA)
           ntu*=7*mdp.nstep;
-      else if (mdp.integrator==ADADADADA || mdp.integrator==ADABADABADA || mdp.integrator==DABADADABAD || mdp.integrator==DADABABADAD || mdp.integrator==POISSON1 || mdp.integrator==POISSON2 || mdp.integrator==POISSON3 || mdp.integrator==POISSON4 || mdp.integrator==POISSON5)
+      else if (mdp.integrator==ADADADADA || mdp.integrator==ADABADABADA || mdp.integrator==DABADADABAD || mdp.integrator==DADABABADAD || mdp.integrator==POISSON1 || mdp.integrator==POISSON2 || mdp.integrator==POISSON3 || mdp.integrator==POISSON4 || mdp.integrator==POISSON5)
           ntu*=8*mdp.nstep;
       else if (mdp.integrator==ADADABADADA || mdp.integrator==BADADADADAB)
           ntu*=9*mdp.nstep;
