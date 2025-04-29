@@ -505,6 +505,31 @@ void read_mdint_parms(int ilv)
           idi=47;
           lambda = 0.0;
       }
+      else if (strcmp(line,"POISSON1")==0)
+      {
+          idi=48;
+          lambda = 0.0;
+      }
+      else if (strcmp(line,"POISSON2")==0)
+      {
+          idi=49;
+          lambda = 0.0;
+      }
+      else if (strcmp(line,"POISSON3")==0)
+      {
+          idi=50;
+          lambda = 0.0;
+      }
+      else if (strcmp(line,"POISSON4")==0)
+      {
+          idi=51;
+          lambda = 0.0;
+      }
+      else if (strcmp(line,"POISSON5")==0)
+      {
+          idi=52;
+          lambda = 0.0;
+      }
       else
          error_root(1,1,"read_mdint_parms [mdint_parms.c]",
                     "Unknown integrator %s",line);
@@ -627,6 +652,16 @@ void read_mdint_parms(int ilv)
       set_mdint_parms(ilv,BABABABABABABAB,lambda,nstep,nfr,ifr);
    else if (idi==47)
       set_mdint_parms(ilv,ABABABABABABABA,lambda,nstep,nfr,ifr);
+   else if (idi==48)
+      set_mdint_parms(ilv,POISSON1,lambda,nstep,nfr,ifr);
+   else if (idi==49)
+      set_mdint_parms(ilv,POISSON2,lambda,nstep,nfr,ifr);
+   else if (idi==50)
+      set_mdint_parms(ilv,POISSON3,lambda,nstep,nfr,ifr);
+   else if (idi==51)
+      set_mdint_parms(ilv,POISSON4,lambda,nstep,nfr,ifr);
+   else if (idi==52)
+      set_mdint_parms(ilv,POISSON5,lambda,nstep,nfr,ifr);
 
    free(ifr);
 }
@@ -769,6 +804,16 @@ void print_mdint_parms(void)
                printf("6th order non-gradient 15-stage decomposition (velocity version)\n");
             else if (mdp[i].integrator==ABABABABABABABA)
                 printf("6th order non-gradient 15-stage decomposition (position version)\n");
+	    else if (mdp[i].integrator==POISSON1)
+                printf("4th order Hessian-free force-gradient integrator variant of DABADADABAD leaving the first order-5 condition non-zero\n");
+	    else if (mdp[i].integrator==POISSON2)
+                printf("4th order Hessian-free force-gradient integrator variant of DABADADABAD leaving the second order-5 condition non-zero\n");
+	    else if (mdp[i].integrator==POISSON3)
+                printf("4th order Hessian-free force-gradient integrator variant of DABADADABAD leaving the third order-5 condition non-zero\n");
+	    else if (mdp[i].integrator==POISSON4)
+                printf("4th order Hessian-free force-gradient integrator variant of DABADADABAD leaving the fourth order-5 condition non-zero\n");
+	    else if (mdp[i].integrator==POISSON5)
+                printf("4th order Hessian-free force-gradient integrator variant of DABADADABAD leaving the fifth order-5 condition non-zero\n");		
             else
                printf("Unknown integrator\n");
 
