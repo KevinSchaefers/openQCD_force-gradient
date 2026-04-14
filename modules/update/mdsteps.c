@@ -1253,7 +1253,7 @@ static void add_frc_steps(double c,mdstep_t *s,mdstep_t *r)
              r[j].eps+=c*s[i].eps;
              break;
           }
-          else if (r[j].iop < iend-4 && s[i].iop < iend-4 && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == c*s[i].eps)
+          else if (r[j].iop < iend-4 && r[j].iop == s[i].iop && r[j].lvl_id == s[i].lvl_id && r[j].lvl_id >= 0 && r[j].eps == c*s[i].eps)
           {
               /* there are two force-gradient updates that we can merge since the temporary updates of the link field use the same step size */
               /* first, we skip all force updates for the temporary link update */
